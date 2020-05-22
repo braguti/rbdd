@@ -1,0 +1,41 @@
+
+include scripts/SOURCES_C.mkf
+include $(R_HOME)/etc$(R_ARCH)/Makeconf
+
+OBJECTS = $(SOURCES_C:.cpp=.o)
+SUBDIRS = gmp-6.1.2 buddy-2.5 cudd-3.0.0
+
+CXX_STD = CXX11
+
+PKG_INCLUDE = -I. -I./buddy-2.5/include -I./cudd-3.0.0/include -I./gmp-6.1.2/include
+PKG_CPPFLAGS = $(PKG_INCLUDE)
+PKG_LIBS = ./gmp-6.1.2/gmp.a ./buddy-2.5/buddy.a ./cudd-3.0.0/cudd.a -lm -fPIC
+
+PKG_SUBCFLAGS = -fPIC
+PKG_SUBCXXFLAGS = -fPIC
+
+all: $(SHLIB)
+
+$(SHLIB): $(OBJECTS) sublibs
+
+sublibs: subclean sublibraries subcleano
+
+sublibraries: subclean
+	@for d in $(SUBDIRS); do \
+		(cd $${d} && PKG_CC="$(CC)" PKG_CXX="$(CXX)" PKG_CFLAGS="$(PKG_SUBCFLAGS)" PKG_CXXFLAGS="$(PKG_SUBCXXFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)" MAKE="$(MAKE) -f Makefile" $(MAKE) -f Makefile library) || exit 1; \
+	done
+
+clean: subclean
+	@-rm -rf .libs _libs
+	@-rm -f .o $(SHLIB)
+
+subclean:
+	@-rm -f *.a
+	@for d in $(SUBDIRS); do \
+		(cd $${d} && MAKE="$(MAKE) -f Makefile" $(MAKE) -f Makefile clean) || exit 1; \
+	done
+
+subcleano:
+	@for d in $(SUBDIRS); do \
+		(cd $${d} && MAKE="$(MAKE) -f Makefile" $(MAKE) -f Makefile clean) || exit 1; \
+	done
