@@ -26,7 +26,8 @@ SemanticsCudd::SemanticsCudd(const BDD& a, const BDD& b) : logicValue(std::pair<
 
 std::ostream& operator<<(std::ostream& os, const SemanticsCudd& t) {
     if (SemanticsCudd::pmgr == NULL) {
-        Rcpp::stop("Manager is NULL");
+        std::cerr << "Manager is NULL" << std::endl;
+        exit(-1);
     }
     //if (t.isStr) os << t.strValue;
     //else os << "{" << (t.logicValue.first) << ", " << (t.logicValue.second) << "}";
@@ -51,8 +52,8 @@ const SemanticsCudd operator||(const SemanticsCudd& e1, const SemanticsCudd& e2)
 
 const SemanticsCudd operator==(const SemanticsCudd& e1, const SemanticsCudd& e2) {
     return SemanticsCudd(
-                        ((e1.logicValue.first   & e2.logicValue.first)    | ((!e1.logicValue.first)   & !e2.logicValue.first)) &
-                         ((e1.logicValue.second & e2.logicValue.second)  | ((!e1.logicValue.second) & !e2.logicValue.second)),
+                        ((e1.logicValue.first   & e2.logicValue.first)    | (!e1.logicValue.first   & !e2.logicValue.first)) &
+                         ((e1.logicValue.second & e2.logicValue.second)  | (!e1.logicValue.second & !e2.logicValue.second)),
                           SemanticsCudd::pmgr->bddZero());
                           }
 
@@ -61,20 +62,20 @@ const SemanticsCudd operator!=(const SemanticsCudd& e1, const SemanticsCudd& e2)
 }
 
 const SemanticsCudd operator!(const SemanticsCudd& e) {
-    return SemanticsCudd((!e.logicValue.first) | e.logicValue.second,
+    return SemanticsCudd(! e.logicValue.first | e.logicValue.second,
                                          e.logicValue.second);
 }
 
 const SemanticsCudd operator<(const SemanticsCudd& e1, const SemanticsCudd& e2) {
     return SemanticsCudd(e2.logicValue.first.Ite(
-                                 e2.logicValue.second.Ite((!e1.logicValue.first) | e1.logicValue.second, SemanticsCudd::pmgr->bddOne()),
-                                 (!e1.logicValue.first) & !e1.logicValue.second), SemanticsCudd::pmgr->bddZero());
+                                 e2.logicValue.second.Ite(! e1.logicValue.first | e1.logicValue.second, SemanticsCudd::pmgr->bddOne()),
+                                 !e1.logicValue.first & !e1.logicValue.second), SemanticsCudd::pmgr->bddZero());
 }
 
 const SemanticsCudd operator>(const SemanticsCudd& e1, const SemanticsCudd& e2) {
     return SemanticsCudd(e1.logicValue.first.Ite(
-                                       e1.logicValue.second.Ite((!e2.logicValue.first) | e2.logicValue.second, SemanticsCudd::pmgr->bddOne()),
-                          (!e2.logicValue.first) & !e2.logicValue.second), SemanticsCudd::pmgr->bddZero());
+                                       e1.logicValue.second.Ite(!e2.logicValue.first | e2.logicValue.second, SemanticsCudd::pmgr->bddOne()),
+                          !e2.logicValue.first & !e2.logicValue.second), SemanticsCudd::pmgr->bddZero());
 }
 
 bool equal(const SemanticsCudd& e1, const SemanticsCudd& e2) {

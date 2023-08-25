@@ -22,25 +22,25 @@ std::pair<SemanticsCudd, int> bddParserCudd::parseBdd(std::string expression, st
 		
 		RbddElem rbddElem = RbddUtils::getRbddElem(currentBDD, rbddElems);
 		
-		if (rbddElem.getAdapter() == NULL) {
-			Rcpp::Rcerr << "There is not defined a BDD called " << currentBDD << std::endl;
+		if (rbddElem.getFactory() == NULL) {
+			std::cerr << "There is not defined a BDD called " << currentBDD << std::endl;
 			std::pair<SemanticsCudd, int> result(semCudd, 0);
 			return result;
 		}
 		
-		cuddAdapter* cAdapter = dynamic_cast<cuddAdapter*> (rbddElem.getAdapter());
-		bool cudd = cAdapter != nullptr;
+		cuddFactory* cFactory = dynamic_cast<cuddFactory*> (rbddElem.getFactory());
+		bool cudd = cFactory != nullptr;
 
 		if (!cudd && isFirst) {
 			std::pair<SemanticsCudd, int> result(semCudd, -1);
 			return result;
 		} else if (!cudd && !isFirst) {
-			Rcpp::Rcerr << "There are BDD defined with different BDD libraries." << std::endl;
+			std::cerr << "There are BDD defined with different BDD libraries." << std::endl;
 			std::pair<SemanticsCudd, int> result(semCudd, 0);
 			return result;
 		}
 		
-		SemanticsCudd currentSemCudd(!cAdapter->getVar(currentBDD).main(), !cAdapter->getVar(currentBDD).module());
+		SemanticsCudd currentSemCudd(!cFactory->getVarBDD(currentBDD).main(), !cFactory->getVarBDD(currentBDD).module());
 		if (isNeg) {
 			SemanticsCudd currentSemCudd(!currentSemCudd.main(), !currentSemCudd.module());
 		}

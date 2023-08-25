@@ -8,7 +8,7 @@ RbddElem RbddUtils::getRbddElem(std::string bddName, std::vector<RbddElem> rbddE
 	bool found = false;
 	int i = 0;
 
-	while (i < (int) rbddElems.size() && !found) {
+	while (i < rbddElems.size() && !found) {
 		RbddElem temp = rbddElems[i];
 		found = bddName == temp.getName();
 		if (found) {
@@ -25,7 +25,7 @@ std::vector<RbddElem> RbddUtils::replaceRbddElem(RbddElem rbddElem, std::vector<
 	bool found = false;
 	int i = 0;
 
-	while (i < (int) rbddElems.size() && !found) {
+	while (i < rbddElems.size() && !found) {
 		RbddElem temp = rbddElems[i];
 		found = rbddElem.getName() == temp.getName();
 		if (found) {
@@ -42,7 +42,7 @@ std::vector<RbddElem> RbddUtils::deleteRbddElem(RbddElem rbddElem, std::vector<R
 	bool found = false;
 	int i = 0;
 
-	while (i < (int) rbddElems.size() && !found) {
+	while (i < rbddElems.size() && !found) {
 		RbddElem temp = rbddElems[i];
 		found = rbddElem.getName() == temp.getName();
 		if (found) {

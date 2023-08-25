@@ -6,109 +6,71 @@
 //  Copyright (c) 2013 david. All rights reserved.
 //
 
-#ifndef __varInfo__
-#define __varInfo__
+#ifndef __myKconf__varInfo__
+#define __myKconf__varInfo__
 
 #include <string>
 #include <iostream>
-#include <sstream>
 #include <list>
 
 #include "synExp.hpp"
+#include "primalGraph.hpp"
+
+class Driver;
 
 class varInfo {
     
     public:
-    static std::map<std::string, int> depCount;
     
-    varInfo()       { dependsVar = synTrue; innerDep = synTrue; timesCalledSetDependStack = 0;}
+    varInfo()       { dependsVar = synTrue; }
     ~varInfo()      {  }
     void clear()    {  }
     
     virtual void setPos(int x) {};
     virtual int getPos() { return 0;}
     
+    virtual void setSelectable() {};
     virtual void print(std::ostream& os);
     virtual bool isChoice() { return false; }
-    void    addDepends(synExp* dep)  { dependsVar = makeAnd(dependsVar, dep->copy_exp()); };
-    virtual void    addVisibility(synExp *e) = 0;
+    void    addDepends(synExp* dep)  { dependsVar = makeAnd(dependsVar, dep); };
+    virtual void    addVisibility(synExp *e) {};
     virtual int     selectSize() { return 0;}
     friend  std::ostream& operator<<(std::ostream& os, varInfo* vi);
     
+    virtual void            processDefaults() {};
     virtual bool            isPrompt() = 0;
     virtual std::list<synExp*>         giveConstraint()    = 0;
-    virtual void            activatePrompt()
-                        { throw std::runtime_error( "called activatePrompt from pure virtual" );}
-    virtual void            setChoiceMember() {};
-    virtual bool            isChoiceMember() { return false; };
+    virtual void            activatePrompt() { std::cerr << "In varInfo. Error" << std::endl;}
             void            setMenuName(std::string s) { menuName = s;}
-    virtual void            setName(const std::string& s) = 0;
-    virtual void            setPrompText(const std::string& s) = 0;
-    virtual void            setPromptGuard(synExp* g) = 0;
-    virtual void            setVartype(const std::string& s) = 0;
-            void            setFile(const std::string& s){ file = s; }
-    std::string             getFile() { return file; }
-    virtual void            setValue(synExp* s) = 0;
-    virtual void            setFirstVar(int b) = 0;
-    virtual void            setSecondVar(int b) = 0;
-    virtual void            setHasConfig() = 0;
-    virtual void            push_default(synExp *a, synExp *b) = 0;
-   
+    virtual void            setName(std::string s){}
+    virtual void            setPrompText(std::string s){}
+    virtual void            setPromptGuard(synExp* g) {};
+    virtual void            setVartype(std::string s){}
+            void            setFile(std::string s){ file = s; }
+    virtual void            setValue(synExp* s) {}
+    virtual void            setFirstVar(int b) {}
+    virtual void            setSecondVar(int b) {}
+    virtual void            setHasConfig() {};
+    virtual void            push_default(synExp *a, synExp *b) {}
+    virtual void            addSelect(std::string s, synExp *e) {}
     virtual synExp*         getVisibility()                { return synTrue; }
 
             synExp*         getDependsVar()      { return dependsVar; };
     virtual std::string     getVartype()   = 0;
     virtual synExp*         getValue()     = 0;
-
     virtual std::string     getName()      = 0;
     virtual std::string     getPrompText() = 0;
     virtual synExp*         getPromptGuard()     { return NULL; }
     virtual bool            getHasConfig()       { return false; }
+    virtual void            addToPrimalGraph(primalGraph& pg) {};
+    virtual void            addSymbolsToPrimalGraph(const std::set<std::string>& theSet, primalGraph& pg) {};
     
-    virtual std::string     getAlternative()                      { return ""; }
-    virtual void            setAlternative(const std::string& s) {    }
     
-    virtual void    addMapSelect(const std::string& x, synExp* e)
-                        { throw std::runtime_error( "Error, calling varInfo addMapSelect method.");}
-    //virtual void         addIfDeclaration(synExp* e) {};
-    
-   
-    virtual bool        isArtificial()                          { return false;       }
-    virtual void        setIsStringValue()                      = 0;
-    virtual bool        isStringValue()                         = 0;
-    virtual void        setExternalIfGuard(synExp* guard)       { }
-    virtual synExp*     getExternalIfGuard()                    { return synTrue;     }
-    virtual void        addDeclaration(const std::string& s)    { }
-    virtual std::string getCondition()                          { return "";          }
-    virtual void        addStringAlternative(std::string string)     = 0;
-    void                setDependStack(std::vector<synExp*>& v)  {
-        timesCalledSetDependStack++;
-        if (timesCalledSetDependStack > 1) {
-            std::ostringstream ost;
-            ost << "Called " << timesCalledSetDependStack << " times for the same varInfo";
-            throw std::logic_error(ost.str());
-        }
-        
-        for(synExp* s : v) {
-            dependStack.push_front(s);
-        }
-    }
-    std::list<synExp*>  getDepStack()                           { return dependStack;              }
-    void                setDepLength(int i)                     { deplength = i;                   }
-    int                 getDepLength()                          { return deplength;                }
-    void                addInnerDep(synExp* s)                  { innerDep = makeAnd(innerDep, s); };
-    void       simplifyDependency();
     private :
     
     std::string             file;
     std::string             menuName;
-    int                     deplength, timesCalledSetDependStack;
-    
-    protected :
-    
-    std::list<synExp*>    dependStack;
-    synExp*               dependsVar, *innerDep;
-
+    synExp*                 dependsVar;
     
 };
-#endif /* defined(__varInfo__) */
+#endif /* defined(__myKconf__varInfo__) */

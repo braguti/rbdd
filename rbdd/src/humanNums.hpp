@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 david. All rights reserved.
 //
 
-#ifndef __humanNums__
-#define __humanNums__
+#ifndef __myKconf__humanNums__
+#define __myKconf__humanNums__
 
 #include <stdio.h>
 #include <string>
@@ -18,4 +18,4 @@
 std::string showHuman(double n);
 std::string showHuman(int n);
 
-#endif /* defined(__humanNums__) */
+#endif /* defined(__myKconf__humanNums__) */

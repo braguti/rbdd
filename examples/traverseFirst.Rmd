@@ -1,0 +1,134 @@
+# Lil implementation of traverse
+mybdd <- list(varnames= c("f4","f5","f6","f3","f2","f1"), 
+            rthen     = c(NA,NA,1,0,3,4,4,0,0,8),
+            relse     = c(NA,NA,0,2,0,3,5,4,7,6),
+            index     = c(6,6,5,4,3,2,1,2,1,0),
+            root      = 9)
+
+mark    <- vector(length = length(mybdd$index))
+result  <- vector(length = length(mybdd$index))
+
+traverse <- function(bdd, foo) {
+
+  traverse_rec <- function(node, foo) {
+        mark[node+1] <<- !mark[node+1];
+        if (node != 0 & node != 1) {
+           low  <- bdd$rthen[node+1]
+           high <- bdd$relse[node+1]
+           if (mark[node+1] != mark[low+1]) { 
+              traverse_rec(low,  foo)
+           }
+           if (mark[node+1] != mark[high+1]) {
+              traverse_rec(high, foo)
+           }
+          result[node+1] <<- foo(bdd, node, result[low+1], result[high+1])
+        }
+        else
+          result[node+1] <<- foo(bdd, node, 0, 0)
+  }
+  traverse_rec(bdd$root, foo)
+  return(result[1+bdd$root])
+}
+
+satcount <- function(bdd) {
+  counter <- function(bdd, node, fthen, felse) { 
+   if (node == 0) return(0)
+   if (node == 1) return(1)
+   pindex <- bdd$index[node+1]
+   tindex <- bdd$index[1+bdd$rthen[node+1]]
+   eindex <- bdd$index[1+bdd$relse[node+1]]
+   return (2**(tindex - pindex - 1)*fthen + 2**(eindex - pindex -1)*felse)
+  }
+  return (2**(bdd$index[bdd$root+1])*traverse(bdd, counter))
+}
+
+deadAndCore <- function(bdd) {
+  through_low  <- vector(length = length(bdd$varnames))
+  through_high <- vector(length = length(bdd$varnames))
+
+  fillTables <- function(bdd, node, fthen, felse) {
+    if (node == 0 | node == 1) return(NA)
+    low    <- bdd$relse[node+1]
+    high   <- bdd$rthen[node+1]
+    pindex <- bdd$index[node+1]
+    tindex <- bdd$index[1+high]
+    eindex <- bdd$index[1+low]
+ 
+    if (low != 0) {
+       through_low[1+pindex] <<- TRUE
+       i <- pindex+2
+       while(i < eindex+1) {
+        through_low[i]  <<- TRUE
+        through_high[i] <<- TRUE
+        i <- i+1
+       }
+    }
+    if (high != 0) {
+       through_high[1+pindex] <<- TRUE
+       i <- pindex+2
+       while(i < tindex+1) {
+        through_low[i]  <<- TRUE
+        through_high[i] <<- TRUE
+        i <- i+1
+       }
+    }
+    return(NA)
+  }
+  
+  traverse(bdd, fillTables)
+  core <- bdd$varnames[through_high & !through_low]
+  dead <- bdd$varnames[through_low  & !through_high]
+  cat("core features:", core, "\n")
+  cat("dead features:", dead, "\n")
+}
+
+generateRandom <- function(bdd, howmany) {
+  coefficients <- vector(length = length(bdd$index))
+  
+    computeProbabilities <- function(bdd, node, fthen, felse) { 
+     if (node == 0) {
+        return(0)
+     }
+     if (node == 1) {
+        return(1)
+     }
+     pindex     <- bdd$index[node+1]
+     tindex     <- bdd$index[1+bdd$rthen[node+1]]
+     eindex     <- bdd$index[1+bdd$relse[node+1]]
+     lowprods   <- 2**(eindex - pindex -1)*felse
+     highprods  <- 2**(tindex - pindex - 1)*fthen
+     totalprods <- lowprods+highprods
+     
+     if (totalprods == 0) {
+        coefficients[node+1] <<- 0
+     }
+     else {
+        coefficients[node+1] <<- highprods / totalprods
+     }
+    return (totalprods)
+  }
+  
+  generateOne <- function(bdd) {
+    product <- vector(length = length(bdd$varnames))
+    trav <- bdd$root
+    while (trav != 1) {
+       if (runif(1) < coefficients[trav+1]) {
+          product[1+bdd$index[trav+1]] <- TRUE
+          trav = bdd$rthen[1+trav]
+       }
+       else {
+          product[1+bdd$index[trav+1]] <- FALSE
+          trav = bdd$relse[1+trav]
+      }
+    }
+    return (product)
+  }
+  
+  traverse(bdd, computeProbabilities)
+  for(i in 1:howmany)
+     cat(bdd$varnames[generateOne(bdd)], "\n")
+}
+
+cat("Number of products:",satcount(mybdd), "\n")
+deadAndCore(mybdd)
+generateRandom(mybdd, 10)

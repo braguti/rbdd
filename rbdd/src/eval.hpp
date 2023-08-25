@@ -6,15 +6,15 @@
 //  Copyright (c) 2014 david. All rights reserved.
 //
 
-#ifndef __eval__
-#define __eval__
+#ifndef __myKconf__eval__
+#define __myKconf__eval__
 
 #include <stdio.h>
 
 #include "synExp.hpp"
 #include "symbolTable.hpp"
-#include "configInfo.hpp"
+#include "varInfo.hpp"
 
 synExp *eval(synExp* exp);
 
-#endif /* defined(__eval__) */
+#endif /* defined(__myKconf__eval__) */

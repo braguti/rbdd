@@ -40,7 +40,7 @@
 #ifndef YY_YY_SYNEXPPARSER_HPP_INCLUDED
 # define YY_YY_SYNEXPPARSER_HPP_INCLUDED
 // //                    "%code requires" blocks.
-#line 55 "synExpParser.ypp" // lalr1.cc:377
+#line 58 "synExpParser.ypp" // lalr1.cc:377
 
     #include "varInfo.hpp"
     #include "synExp.hpp"
@@ -280,11 +280,8 @@ namespace kconf {
       // T_SYMBOL
       char dummy2[sizeof(std::string)];
 
-      // seqexp
-      char dummy3[sizeof(std::vector<synExp*>)];
-
       // exp
-      char dummy4[sizeof(synExp*)];
+      char dummy3[sizeof(synExp*)];
 };
 
     /// Symbol semantic values.
@@ -322,12 +319,16 @@ namespace kconf {
         T_CLOSEPAREN = 269,
         T_OPENPAREN = 270,
         T_EOL = 271,
-        T_XOR = 272,
-        T_IMPLIES = 273,
-        T_OR = 274,
-        T_AND = 275,
-        T_EQUAL = 276,
-        T_NOT = 277
+        T_IMPLIES = 272,
+        T_OR = 273,
+        T_AND = 274,
+        T_NOR = 275,
+        T_NAND = 276,
+        T_XOR = 277,
+        T_XNOR = 278,
+        T_IF_AND_ONLY_IF = 279,
+        T_NOT = 280,
+        T_EQUAL = 281
       };
     };
 
@@ -368,8 +369,6 @@ namespace kconf {
   basic_symbol (typename Base::kind_type t, const kconf_id* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector<synExp*> v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const synExp* v, const location_type& l);
 
@@ -502,10 +501,6 @@ namespace kconf {
 
     static inline
     symbol_type
-    make_T_XOR (const location_type& l);
-
-    static inline
-    symbol_type
     make_T_IMPLIES (const location_type& l);
 
     static inline
@@ -518,16 +513,35 @@ namespace kconf {
 
     static inline
     symbol_type
-    make_T_EQUAL (const location_type& l);
+    make_T_NOR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_T_NAND (const location_type& l);
+
+    static inline
+    symbol_type
+    make_T_XOR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_T_XNOR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_T_IF_AND_ONLY_IF (const location_type& l);
 
     static inline
     symbol_type
     make_T_NOT (const location_type& l);
 
+    static inline
+    symbol_type
+    make_T_EQUAL (const location_type& l);
+
 
     /// Build a parser object.
     synExpParser (class synExpDriver& driver_yyarg, std::map<int, synExp*> synExpMap_yyarg);
-    synExpParser (class synExpDriver& driver_yyarg);
     virtual ~synExpParser ();
 
     /// Parse.
@@ -730,12 +744,12 @@ namespace kconf {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 120,     ///< Last index in yytable_.
-      yynnts_ = 4,  ///< Number of nonterminal symbols.
-      yyfinal_ = 18, ///< Termination state number.
+      yylast_ = 136,     ///< Last index in yytable_.
+      yynnts_ = 3,  ///< Number of nonterminal symbols.
+      yyfinal_ = 14, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 23  ///< Number of tokens.
+      yyntokens_ = 27  ///< Number of tokens.
     };
 
 
@@ -780,9 +794,10 @@ namespace kconf {
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26
     };
-    const unsigned int user_token_number_max_ = 277;
+    const unsigned int user_token_number_max_ = 281;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -825,11 +840,7 @@ namespace kconf {
         value.copy< std::string > (other.value);
         break;
 
-      case 26: // seqexp
-        value.copy< std::vector<synExp*> > (other.value);
-        break;
-
-      case 25: // exp
+      case 29: // exp
         value.copy< synExp* > (other.value);
         break;
 
@@ -860,11 +871,7 @@ namespace kconf {
         value.copy< std::string > (v);
         break;
 
-      case 26: // seqexp
-        value.copy< std::vector<synExp*> > (v);
-        break;
-
-      case 25: // exp
+      case 29: // exp
         value.copy< synExp* > (v);
         break;
 
@@ -892,13 +899,6 @@ namespace kconf {
 
   template <typename Base>
   synExpParser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  synExpParser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<synExp*> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -947,11 +947,7 @@ namespace kconf {
         value.template destroy< std::string > ();
         break;
 
-      case 26: // seqexp
-        value.template destroy< std::vector<synExp*> > ();
-        break;
-
-      case 25: // exp
+      case 29: // exp
         value.template destroy< synExp* > ();
         break;
 
@@ -988,11 +984,7 @@ namespace kconf {
         value.move< std::string > (s.value);
         break;
 
-      case 26: // seqexp
-        value.move< std::vector<synExp*> > (s.value);
-        break;
-
-      case 25: // exp
+      case 29: // exp
         value.move< synExp* > (s.value);
         break;
 
@@ -1053,7 +1045,7 @@ namespace kconf {
     {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277
+     275,   276,   277,   278,   279,   280,   281
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -1149,12 +1141,6 @@ namespace kconf {
   }
 
   synExpParser::symbol_type
-  synExpParser::make_T_XOR (const location_type& l)
-  {
-    return symbol_type (token::T_XOR, l);
-  }
-
-  synExpParser::symbol_type
   synExpParser::make_T_IMPLIES (const location_type& l)
   {
     return symbol_type (token::T_IMPLIES, l);
@@ -1173,9 +1159,33 @@ namespace kconf {
   }
 
   synExpParser::symbol_type
-  synExpParser::make_T_EQUAL (const location_type& l)
+  synExpParser::make_T_NOR (const location_type& l)
   {
-    return symbol_type (token::T_EQUAL, l);
+    return symbol_type (token::T_NOR, l);
+  }
+
+  synExpParser::symbol_type
+  synExpParser::make_T_NAND (const location_type& l)
+  {
+    return symbol_type (token::T_NAND, l);
+  }
+
+  synExpParser::symbol_type
+  synExpParser::make_T_XOR (const location_type& l)
+  {
+    return symbol_type (token::T_XOR, l);
+  }
+
+  synExpParser::symbol_type
+  synExpParser::make_T_XNOR (const location_type& l)
+  {
+    return symbol_type (token::T_XNOR, l);
+  }
+
+  synExpParser::symbol_type
+  synExpParser::make_T_IF_AND_ONLY_IF (const location_type& l)
+  {
+    return symbol_type (token::T_IF_AND_ONLY_IF, l);
   }
 
   synExpParser::symbol_type
@@ -1184,10 +1194,16 @@ namespace kconf {
     return symbol_type (token::T_NOT, l);
   }
 
+  synExpParser::symbol_type
+  synExpParser::make_T_EQUAL (const location_type& l)
+  {
+    return symbol_type (token::T_EQUAL, l);
+  }
+
 
 #line 30 "synExpParser.ypp" // lalr1.cc:377
 } // kconf
-#line 1189 "synExpParser.hpp" // lalr1.cc:377
+#line 1207 "synExpParser.hpp" // lalr1.cc:377
 
 
 

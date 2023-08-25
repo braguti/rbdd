@@ -47,7 +47,7 @@ BddTree *bddtree_addrange_rec(BddTree *, BddTree *, int, int, int, int);
 
 /*======================================================================*/
 
-void update_seq(BddTree *t)
+static void update_seq(BddTree *t)
 {
    int n, x;
    int low = t->first;

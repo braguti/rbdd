@@ -31,6 +31,7 @@
 
 /* set the parser's class identifier */
 %define parser_class_name {synExpParser}
+
 %define api.token.constructor
 %define api.value.type variant
 
@@ -50,8 +51,10 @@
 //%parse-param { class Driver& driver }
 // The parsing context.
 %param { class synExpDriver& driver }
+%parse-param {std::map<int, synExp*> synExpMap}
 /* verbose error messages */
-%define parse.error verbose
+%error-verbose
+
 %code requires {
     #include "varInfo.hpp"
     #include "synExp.hpp"
@@ -62,7 +65,6 @@
 
 %token <kconf_id*>T_MAINMENU
 %token <kconf_id*>T_MENU
-
 
 
 %token <std::string> T_LITERAL
@@ -77,20 +79,22 @@
 %token T_UNEQUAL
 %token T_CLOSEPAREN
 %token T_OPENPAREN
-//%token T_COMMA
 %token T_EOL
-%token T_XOR
 %token T_EOF 0
 
 
 %right    T_IMPLIES
 %left     T_OR
 %left     T_AND
-%left     T_EQUAL T_UNEQUAL
+%left     T_NOR
+%left     T_NAND
+%left     T_XOR
+%left     T_XNOR
+%left     T_IF_AND_ONLY_IF
 %nonassoc T_NOT
+%left     T_EQUAL T_UNEQUAL
 
 %type<synExp*> exp;
-%type<std::vector<synExp*>> seqexp;
 
 %printer { yyoutput << $$; } <std::string>;
 
@@ -114,62 +118,93 @@
 
 
 explist : explist exp T_EOL {
-    driver.addExp($2);
+	if (driver.getCorrectParsing()) {
+	    driver.addExp($2);
+	}
 };
 
 explist : exp T_EOL {
-    driver.addExp($1);
+	if (driver.getCorrectParsing()) {
+    	driver.addExp($1);
+	}
 };
 
-explist : T_EOF {
-    
-}
 exp : exp T_AND exp {
-    $$ = new synCompound(synAnd, $1, $3);
+    if (driver.getCorrectParsing()) {
+		$$ = makeAnd($1, $3);
+	}
 };
 
 exp : exp T_OR exp {
-    $$ = new synCompound(synOr, $1, $3);
+	if (driver.getCorrectParsing()) {
+    	$$ = makeOr($1, $3);
+	}
+};
+
+exp : exp T_NAND exp {
+	if (driver.getCorrectParsing()) {
+    	$$ = makeNot(makeAnd($1, $3));
+	}
+};
+
+exp : exp T_NOR exp {
+	if (driver.getCorrectParsing()) {
+    	$$ = makeNot(makeOr($1, $3));
+	}
+};
+
+exp : exp T_XOR exp {
+	if (driver.getCorrectParsing()) {
+    	$$ = makeOr(makeAnd($1, makeNot($3)), makeAnd(makeNot($1), $3));
+	}
+};
+
+exp : exp T_XNOR exp {
+	if (driver.getCorrectParsing()) {
+    	$$ = makeNot(makeOr(makeAnd($1, makeNot($3)), makeAnd(makeNot($1), $3)));
+	}
+};
+
+exp : exp T_IF_AND_ONLY_IF exp {
+	if (driver.getCorrectParsing()) {
+    	$$ = makeNot(makeOr(makeAnd($1, makeNot($3)), makeAnd(makeNot($1), $3)));
+	}
 };
 
 exp : T_NOT exp {
-    $$ = new synCompound(synNot, $2);
+	if (driver.getCorrectParsing()) {
+		$$ = makeNot($2);
+	}
 };
-
-exp : T_XOR T_OPENPAREN seqexp T_CLOSEPAREN {
-    $$ = new synXOR($3);
-};
-
-seqexp : exp {
-    $$.push_back($1);
-}
-
-seqexp : seqexp exp {
-    $$ = $1;
-    $$.push_back($2);
-}
-
-seqexp : {
-}
 
 exp : T_IF exp T_THEN exp T_ELSE exp {
-    $$ = new synCompound(synIfThenElse, $2, $4, $6);
+	if (driver.getCorrectParsing()) {
+	    $$ = makeIfThenElse($2, $4, $6);
+	}
 };
 
 exp : T_IF exp T_THEN exp {
-    $$ = new synCompound(synIfThenElse, $2, $4, synTrue);
+    if (driver.getCorrectParsing()) {
+		$$ = makeIfThenElse($2, $4, synTrue);
+	}
 };
 
 exp : T_OPENPAREN exp T_CLOSEPAREN {
-    $$ = $2;
+    if (driver.getCorrectParsing()) {
+		$$ = $2;
+	}
 };
 
 exp : exp T_IMPLIES exp {
-    $$ = new synCompound(synImplies, $1, $3);
+	if (driver.getCorrectParsing()) {
+	    $$ = makeImplies($1, $3);
+	}
 };
 
 exp : exp T_EQUAL exp {
-    $$ = new synCompound(synEqual, $1, $3);
+	if (driver.getCorrectParsing()) {
+	    $$ = makeEqual($1, $3);
+	}
 };
 
 exp : T_TRUE {
@@ -177,7 +212,7 @@ exp : T_TRUE {
 };
 
 exp : T_FALSE {
-    $$ = synFalse;
+   	$$ = synFalse;
 };
 
 exp : T_MODULE {
@@ -189,12 +224,22 @@ exp : T_LITERAL {
 };
 
 exp : T_SYMBOL {
-    $$ = new synSymbol($1);
+	std::map<int, synExp*>::iterator it = synExpMap.begin();
+	bool found = false;
+
+	while (it != synExpMap.end() && !found) {
+		found = $1.compare(it->second->getSymbol()) == 0;
+		++it;
+	}
+
+	if (found) {
+    	$$ = new synSymbol($1);
+	} else {
+		std::cerr << "Symbol \"" << $1 << "\" has not been defined\n" << std::endl;
+		driver.setCorrectParsing(false);
+	}
 };
 
-exp : T_EOL {
-    $$ = synFalse;
-}
 %% /*** Additional Code ***/
 bool is_digits(const std::string &str)
 {
@@ -205,3 +250,4 @@ void kconf::synExpParser::error(const synExpParser::location_type& l,
 {
     driver.error(l, m);
 }
+

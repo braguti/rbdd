@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 david. All rights reserved.
 //
 
-#ifndef __tokens_hash__
-#define __tokens_hash__
+#ifndef OtherKconf_tokens_hash_hpp
+#define OtherKconf_tokens_hash_hpp
 
 #include "kconf_id.hpp"
 

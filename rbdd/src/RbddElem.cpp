@@ -28,12 +28,12 @@ void RbddElem::setCachesize(int cachesize) {
 	this->cachesize = cachesize;
 }
 
-BDDAdapter* RbddElem::getAdapter() {
-	return this->adapter;
+vBDDFactory* RbddElem::getFactory() {
+	return this->factory;
 }
 
-void RbddElem::setAdapter(BDDAdapter* adapter) {
-	this->adapter = adapter;
+void RbddElem::resetFactory() {
+	this->factory = NULL;
 }
 
 std::vector<synExp*> RbddElem::getSynExpMap() {
@@ -76,19 +76,19 @@ void RbddElem::resetNameList() {
 	this->nameList.clear();
 }
 
-void RbddElem::initAdapter(std::string bddName, std::string library, int nodenum, int cachesize) {
+void RbddElem::initFactory(std::string bddName, std::string library, int nodenum, int cachesize) {
 	if (library == "buddy") {
-		this->adapter = new buddyAdapter();
-		this->adapter->init(nodenum, cachesize, bddName);
+		this->factory = new buddyFactory();
+		this->factory->init(true, nodenum, cachesize);
 	} else if (library == "cudd") {
-		this->adapter = new cuddAdapter(1);
-		this->adapter->init(nodenum, cachesize, bddName);
-		this->adapter->setTraverseBDD(bddName);
+		this->factory = new cuddFactory(1);
+		this->factory->init(true, nodenum, cachesize);
 	}
-	
+
 	this->synExpMap.clear();
 	this->varMap.clear();
 	this->nameList.clear();
+	
 	setName(bddName);
 	setNodenum(nodenum);
 	setCachesize(cachesize);

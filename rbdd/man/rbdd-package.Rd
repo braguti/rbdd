@@ -22,9 +22,9 @@ The functions implemented are based on the John Whaley's JavaBDD package
 Maintainer: \packageMaintainer{rbdd}
 }
 \references{
-\href{http://javabdd.sourceforge.net/}{JavaBDD}
-\href{http://buddy.sourceforge.net/manual/main.html}{BuDDy}
-\href{http://davidkebo.com/cudd}{CUDD}
+\code{\link{http://javabdd.sourceforge.net/}}
+\code{\link{http://buddy.sourceforge.net/manual/main.html}}
+\code{\link{http://vlsi.colorado.edu/~fabio/CUDD/html/}}
 }
 \keyword{ package }
 \seealso{

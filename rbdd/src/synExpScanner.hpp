@@ -13,10 +13,10 @@
     kconf::synExpScanner::lex(synExpDriver& driver)
 #endif
 
-#ifndef __FLEX_LEXER_H
-#undef yyFlexLexer  	
+#ifndef __FLEX_LEXER_H  	
 #define yyFlexLexer synExpFlexLexer
 #include "FlexLexer.h"
+#undef yyFlexLexer
 #endif
 
 #include "synExpParser.hpp"

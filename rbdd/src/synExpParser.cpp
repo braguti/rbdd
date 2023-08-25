@@ -42,7 +42,7 @@
 #include <set>
 
 
-#line 98 "synExpParser.ypp" // lalr1.cc:404
+#line 102 "synExpParser.ypp" // lalr1.cc:404
 
 
 #include "synExpDriver.hpp"
@@ -140,7 +140,7 @@
 
 #else // !YYDEBUG
 
-# define YYCDEBUG if (false) Rcpp::Rcerr
+# define YYCDEBUG if (false) std::cerr
 # define YY_SYMBOL_PRINT(Title, Symbol)  YYUSE(Symbol)
 # define YY_REDUCE_PRINT(Rule)           static_cast<void>(0)
 # define YY_STACK_PRINT()                static_cast<void>(0)
@@ -202,20 +202,10 @@ namespace kconf {
     :
 #if YYDEBUG
       yydebug_ (false),
-      yycdebug_ (&Rcpp::Rcerr),
+      yycdebug_ (&std::cerr),
 #endif
       driver (driver_yyarg),
       synExpMap (synExpMap_yyarg)
-  {}
-
-  /// Build a parser object.
-  synExpParser::synExpParser (class synExpDriver& driver_yyarg)
-    :
-#if YYDEBUG
-      yydebug_ (false),
-      yycdebug_ (&Rcpp::Rcerr),
-#endif
-      driver (driver_yyarg)
   {}
 
   synExpParser::~synExpParser ()
@@ -290,11 +280,7 @@ namespace kconf {
         value.move< std::string > (that.value);
         break;
 
-      case 26: // seqexp
-        value.move< std::vector<synExp*> > (that.value);
-        break;
-
-      case 25: // exp
+      case 29: // exp
         value.move< synExp* > (that.value);
         break;
 
@@ -323,11 +309,7 @@ namespace kconf {
         value.copy< std::string > (that.value);
         break;
 
-      case 26: // seqexp
-        value.copy< std::vector<synExp*> > (that.value);
-        break;
-
-      case 25: // exp
+      case 29: // exp
         value.copy< synExp* > (that.value);
         break;
 
@@ -360,9 +342,8 @@ namespace kconf {
     symbol_number_type yytype = yysym.type_get ();
     // Avoid a (spurious) G++ 4.8 warning about "array subscript is
     // below array bounds".
-    if (yysym.empty ()) {
-      Rcpp::stop("");
-    }
+    if (yysym.empty ())
+      std::abort ();
     yyo << (yytype < yyntokens_ ? "token" : "nterm")
         << ' ' << yytname_[yytype] << " ("
         << yysym.location << ": ";
@@ -370,16 +351,16 @@ namespace kconf {
     {
             case 5: // T_LITERAL
 
-#line 95 "synExpParser.ypp" // lalr1.cc:636
+#line 99 "synExpParser.ypp" // lalr1.cc:636
         { yyoutput << yysym.value.template as< std::string > (); }
-#line 364 "synExpParser.cpp" // lalr1.cc:636
+#line 357 "synExpParser.cpp" // lalr1.cc:636
         break;
 
       case 6: // T_SYMBOL
 
-#line 95 "synExpParser.ypp" // lalr1.cc:636
+#line 99 "synExpParser.ypp" // lalr1.cc:636
         { yyoutput << yysym.value.template as< std::string > (); }
-#line 371 "synExpParser.cpp" // lalr1.cc:636
+#line 364 "synExpParser.cpp" // lalr1.cc:636
         break;
 
 
@@ -492,13 +473,13 @@ namespace kconf {
 
 
     // User initialization code.
-    #line 42 "synExpParser.ypp" // lalr1.cc:741
+    #line 43 "synExpParser.ypp" // lalr1.cc:741
 {
     // initialize the initial location object
     yyla.location.begin.filename = yyla.location.end.filename = &driver.streamname;
 }
 
-#line 490 "synExpParser.cpp" // lalr1.cc:741
+#line 483 "synExpParser.cpp" // lalr1.cc:741
 
     /* Initialize the stack.  The initial state will be set in
        yynewstate, since the latter expects the semantical and the
@@ -598,11 +579,7 @@ namespace kconf {
         yylhs.value.build< std::string > ();
         break;
 
-      case 26: // seqexp
-        yylhs.value.build< std::vector<synExp*> > ();
-        break;
-
-      case 25: // exp
+      case 29: // exp
         yylhs.value.build< synExp* > ();
         break;
 
@@ -624,192 +601,210 @@ namespace kconf {
           switch (yyn)
             {
   case 2:
-#line 116 "synExpParser.ypp" // lalr1.cc:859
+#line 120 "synExpParser.ypp" // lalr1.cc:859
     {
-    driver.addExp(yystack_[1].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+	    driver.addExp(yystack_[1].value.as< synExp* > ());
+	}
 }
-#line 620 "synExpParser.cpp" // lalr1.cc:859
+#line 611 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 3:
-#line 120 "synExpParser.ypp" // lalr1.cc:859
+#line 126 "synExpParser.ypp" // lalr1.cc:859
     {
-    driver.addExp(yystack_[1].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+    	driver.addExp(yystack_[1].value.as< synExp* > ());
+	}
 }
-#line 628 "synExpParser.cpp" // lalr1.cc:859
+#line 621 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 4:
-#line 124 "synExpParser.ypp" // lalr1.cc:859
+#line 132 "synExpParser.ypp" // lalr1.cc:859
     {
-    
+    if (driver.getCorrectParsing()) {
+		yylhs.value.as< synExp* > () = makeAnd(yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	}
 }
-#line 636 "synExpParser.cpp" // lalr1.cc:859
+#line 631 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 5:
-#line 127 "synExpParser.ypp" // lalr1.cc:859
+#line 138 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synCompound(synAnd, yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+    	yylhs.value.as< synExp* > () = makeOr(yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	}
 }
-#line 644 "synExpParser.cpp" // lalr1.cc:859
+#line 641 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 6:
-#line 131 "synExpParser.ypp" // lalr1.cc:859
+#line 144 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synCompound(synOr, yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+    	yylhs.value.as< synExp* > () = makeNot(makeAnd(yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ()));
+	}
 }
-#line 652 "synExpParser.cpp" // lalr1.cc:859
+#line 651 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 7:
-#line 135 "synExpParser.ypp" // lalr1.cc:859
+#line 150 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synCompound(synNot, yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+    	yylhs.value.as< synExp* > () = makeNot(makeOr(yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ()));
+	}
 }
-#line 660 "synExpParser.cpp" // lalr1.cc:859
+#line 661 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 8:
-#line 139 "synExpParser.ypp" // lalr1.cc:859
+#line 156 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synXOR(yystack_[1].value.as< std::vector<synExp*> > ());
+	if (driver.getCorrectParsing()) {
+    	yylhs.value.as< synExp* > () = makeOr(makeAnd(yystack_[2].value.as< synExp* > (), makeNot(yystack_[0].value.as< synExp* > ())), makeAnd(makeNot(yystack_[2].value.as< synExp* > ()), yystack_[0].value.as< synExp* > ()));
+	}
 }
-#line 668 "synExpParser.cpp" // lalr1.cc:859
+#line 671 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 9:
-#line 143 "synExpParser.ypp" // lalr1.cc:859
+#line 162 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< std::vector<synExp*> > ().push_back(yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+    	yylhs.value.as< synExp* > () = makeNot(makeOr(makeAnd(yystack_[2].value.as< synExp* > (), makeNot(yystack_[0].value.as< synExp* > ())), makeAnd(makeNot(yystack_[2].value.as< synExp* > ()), yystack_[0].value.as< synExp* > ())));
+	}
 }
-#line 676 "synExpParser.cpp" // lalr1.cc:859
+#line 681 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 10:
-#line 147 "synExpParser.ypp" // lalr1.cc:859
+#line 168 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< std::vector<synExp*> > () = yystack_[1].value.as< std::vector<synExp*> > ();
-    yylhs.value.as< std::vector<synExp*> > ().push_back(yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+    	yylhs.value.as< synExp* > () = makeNot(makeOr(makeAnd(yystack_[2].value.as< synExp* > (), makeNot(yystack_[0].value.as< synExp* > ())), makeAnd(makeNot(yystack_[2].value.as< synExp* > ()), yystack_[0].value.as< synExp* > ())));
+	}
 }
-#line 685 "synExpParser.cpp" // lalr1.cc:859
+#line 691 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 11:
-#line 152 "synExpParser.ypp" // lalr1.cc:859
+#line 174 "synExpParser.ypp" // lalr1.cc:859
     {
+	if (driver.getCorrectParsing()) {
+		yylhs.value.as< synExp* > () = makeNot(yystack_[0].value.as< synExp* > ());
+	}
 }
-#line 692 "synExpParser.cpp" // lalr1.cc:859
+#line 701 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 12:
-#line 155 "synExpParser.ypp" // lalr1.cc:859
+#line 180 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synCompound(synIfThenElse, yystack_[4].value.as< synExp* > (), yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+	    yylhs.value.as< synExp* > () = makeIfThenElse(yystack_[4].value.as< synExp* > (), yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	}
 }
-#line 700 "synExpParser.cpp" // lalr1.cc:859
+#line 711 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 13:
-#line 159 "synExpParser.ypp" // lalr1.cc:859
+#line 186 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synCompound(synIfThenElse, yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > (), synTrue);
+    if (driver.getCorrectParsing()) {
+		yylhs.value.as< synExp* > () = makeIfThenElse(yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > (), synTrue);
+	}
 }
-#line 708 "synExpParser.cpp" // lalr1.cc:859
+#line 721 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 14:
-#line 163 "synExpParser.ypp" // lalr1.cc:859
+#line 192 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = yystack_[1].value.as< synExp* > ();
+    if (driver.getCorrectParsing()) {
+		yylhs.value.as< synExp* > () = yystack_[1].value.as< synExp* > ();
+	}
 }
-#line 716 "synExpParser.cpp" // lalr1.cc:859
+#line 731 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 15:
-#line 167 "synExpParser.ypp" // lalr1.cc:859
+#line 198 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synCompound(synImplies, yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+	    yylhs.value.as< synExp* > () = makeImplies(yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	}
 }
-#line 724 "synExpParser.cpp" // lalr1.cc:859
+#line 741 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 16:
-#line 171 "synExpParser.ypp" // lalr1.cc:859
+#line 204 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = new synCompound(synEqual, yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	if (driver.getCorrectParsing()) {
+	    yylhs.value.as< synExp* > () = makeEqual(yystack_[2].value.as< synExp* > (), yystack_[0].value.as< synExp* > ());
+	}
 }
-#line 732 "synExpParser.cpp" // lalr1.cc:859
+#line 751 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 17:
-#line 175 "synExpParser.ypp" // lalr1.cc:859
+#line 210 "synExpParser.ypp" // lalr1.cc:859
     {
     yylhs.value.as< synExp* > () = synTrue;
 }
-#line 740 "synExpParser.cpp" // lalr1.cc:859
+#line 759 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 18:
-#line 179 "synExpParser.ypp" // lalr1.cc:859
+#line 214 "synExpParser.ypp" // lalr1.cc:859
     {
-    yylhs.value.as< synExp* > () = synFalse;
+   	yylhs.value.as< synExp* > () = synFalse;
 }
-#line 748 "synExpParser.cpp" // lalr1.cc:859
+#line 767 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 19:
-#line 183 "synExpParser.ypp" // lalr1.cc:859
+#line 218 "synExpParser.ypp" // lalr1.cc:859
     {
     yylhs.value.as< synExp* > () = synModule;
 }
-#line 756 "synExpParser.cpp" // lalr1.cc:859
+#line 775 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 20:
-#line 187 "synExpParser.ypp" // lalr1.cc:859
+#line 222 "synExpParser.ypp" // lalr1.cc:859
     {
     yylhs.value.as< synExp* > () = new synString(yystack_[0].value.as< std::string > ());
 }
-#line 764 "synExpParser.cpp" // lalr1.cc:859
+#line 783 "synExpParser.cpp" // lalr1.cc:859
     break;
 
   case 21:
-#line 191 "synExpParser.ypp" // lalr1.cc:859
+#line 226 "synExpParser.ypp" // lalr1.cc:859
     {
-  if (synExpMap.size() > 0) {
-    std::map<int, synExp*>::iterator it = synExpMap.begin();
-    bool found = false;
+	std::map<int, synExp*>::iterator it = synExpMap.begin();
+	bool found = false;
 
-    while (it != synExpMap.end() && !found) {
-      found = yystack_[0].value.as< std::string > ().compare(it->second->getSymbol()) == 0;
-      ++it;
-    }
+	while (it != synExpMap.end() && !found) {
+		found = yystack_[0].value.as< std::string > ().compare(it->second->getSymbol()) == 0;
+		++it;
+	}
 
-    if (found) {
-        yylhs.value.as< synExp* > () = new synSymbol(yystack_[0].value.as< std::string > ());
-    } else {
-      Rcpp::Rcerr << "Symbol \"" << yystack_[0].value.as< std::string > () << "\" has not been defined\n" << std::endl;
-      driver.setCorrectParsing(false);
-    }
-  } else {
-    yylhs.value.as< synExp* > () = new synSymbol(yystack_[0].value.as< std::string > ());
-  }
+	if (found) {
+    	yylhs.value.as< synExp* > () = new synSymbol(yystack_[0].value.as< std::string > ());
+	} else {
+		std::cerr << "Symbol \"" << yystack_[0].value.as< std::string > () << "\" has not been defined\n" << std::endl;
+		driver.setCorrectParsing(false);
+	}
 }
-#line 772 "synExpParser.cpp" // lalr1.cc:859
-    break;
-
-  case 22:
-#line 195 "synExpParser.ypp" // lalr1.cc:859
-    {
-    yylhs.value.as< synExp* > () = synFalse;
-}
-#line 780 "synExpParser.cpp" // lalr1.cc:859
+#line 804 "synExpParser.cpp" // lalr1.cc:859
     break;
 
 
-#line 784 "synExpParser.cpp" // lalr1.cc:859
+#line 808 "synExpParser.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -1064,99 +1059,104 @@ namespace kconf {
   }
 
 
-  const signed char synExpParser::yypact_ninf_ = -15;
+  const signed char synExpParser::yypact_ninf_ = -18;
 
   const signed char synExpParser::yytable_ninf_ = -1;
 
   const signed char
   synExpParser::yypact_[] =
   {
-      19,   -15,   -15,   -15,   -15,   -15,   -15,    73,    73,   -15,
-     -13,    73,    37,    93,    -8,    87,    73,   -15,   -15,    99,
-     -15,    73,    73,    73,    73,    73,   -15,    30,    55,   -15,
-      30,   -14,    -1,   -15,    79,   -15,    30,    73,    30
+      32,   -18,   -18,   -18,   -18,   -18,    32,    32,    32,    21,
+      76,    41,    65,   -17,   -18,    87,   -18,    32,    32,    32,
+      32,    32,    32,    32,    32,    32,    32,   -18,   -18,    97,
+     105,   -16,    27,   110,    -1,     8,   -17,   -18,    54,    32,
+      97
   };
 
   const unsigned char
   synExpParser::yydefact_[] =
   {
-       0,     4,    20,    21,    17,    18,    19,     0,     0,    22,
-       0,     0,     0,     0,     0,     0,    11,     7,     1,     0,
-       3,     0,     0,     0,     0,     0,    14,     9,     0,     2,
-      15,     6,     5,    16,    13,     8,    10,     0,    12
+       0,    20,    21,    17,    18,    19,     0,     0,     0,     0,
+       0,     0,     0,    11,     1,     0,     3,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    14,     2,    15,
+       5,     4,     7,     6,     8,     9,    10,    16,    13,     0,
+      12
   };
 
   const signed char
   synExpParser::yypgoto_[] =
   {
-     -15,   -15,    -7,   -15
+     -18,   -18,    -6
   };
 
   const signed char
   synExpParser::yydefgoto_[] =
   {
-      -1,    12,    13,    28
+      -1,     9,    10
   };
 
   const unsigned char
   synExpParser::yytable_[] =
   {
-      14,    15,    16,    25,    17,    19,    23,    24,     0,    27,
-      21,    22,    23,    24,    30,    31,    32,    33,    34,     1,
-      24,    36,     0,     0,     2,     3,     4,     5,     6,     7,
-      38,     0,     0,     0,     8,     9,    10,    18,     0,     0,
-       0,    11,     2,     3,     4,     5,     6,     7,    21,    22,
-      23,    24,     8,     9,    10,     0,     0,     0,     0,    11,
-       2,     3,     4,     5,     6,     7,     0,     0,     0,    35,
-       8,     9,    10,     0,     0,     0,     0,    11,     2,     3,
-       4,     5,     6,     7,     0,     0,     0,     0,     8,     9,
-      10,    37,     0,     0,     0,    11,     0,    21,    22,    23,
-      24,    26,     0,     0,     0,    21,    22,    23,    24,    20,
-       0,    21,    22,    23,    24,    29,     0,    21,    22,    23,
-      24
+      11,    12,    13,    15,    20,    21,    22,    23,    24,    25,
+      25,    29,    30,    31,    32,    33,    34,    35,    36,    37,
+      38,    14,    23,    24,     0,    25,     1,     2,     3,     4,
+       5,     6,    24,    40,    25,     0,     7,     1,     2,     3,
+       4,     5,     6,     0,     0,     0,     8,     7,    21,    22,
+      23,    24,    26,    25,     0,     0,     0,     8,    17,    18,
+      19,    20,    21,    22,    23,    24,    39,    25,     0,     0,
+       0,    17,    18,    19,    20,    21,    22,    23,    24,    27,
+      25,     0,    17,    18,    19,    20,    21,    22,    23,    24,
+       0,    25,    16,    17,    18,    19,    20,    21,    22,    23,
+      24,     0,    25,    28,    17,    18,    19,    20,    21,    22,
+      23,    24,     0,    25,    17,    18,    19,    20,    21,    22,
+      23,    24,     0,    25,    19,    20,    21,    22,    23,    24,
+       0,    25,    22,    23,    24,     0,    25
   };
 
   const signed char
   synExpParser::yycheck_[] =
   {
-       7,     8,    15,    11,    11,    12,    20,    21,    -1,    16,
-      18,    19,    20,    21,    21,    22,    23,    24,    25,     0,
-      21,    28,    -1,    -1,     5,     6,     7,     8,     9,    10,
-      37,    -1,    -1,    -1,    15,    16,    17,     0,    -1,    -1,
-      -1,    22,     5,     6,     7,     8,     9,    10,    18,    19,
-      20,    21,    15,    16,    17,    -1,    -1,    -1,    -1,    22,
-       5,     6,     7,     8,     9,    10,    -1,    -1,    -1,    14,
-      15,    16,    17,    -1,    -1,    -1,    -1,    22,     5,     6,
-       7,     8,     9,    10,    -1,    -1,    -1,    -1,    15,    16,
-      17,    12,    -1,    -1,    -1,    22,    -1,    18,    19,    20,
-      21,    14,    -1,    -1,    -1,    18,    19,    20,    21,    16,
-      -1,    18,    19,    20,    21,    16,    -1,    18,    19,    20,
-      21
+       6,     7,     8,     9,    20,    21,    22,    23,    24,    26,
+      26,    17,    18,    19,    20,    21,    22,    23,    24,    25,
+      26,     0,    23,    24,    -1,    26,     5,     6,     7,     8,
+       9,    10,    24,    39,    26,    -1,    15,     5,     6,     7,
+       8,     9,    10,    -1,    -1,    -1,    25,    15,    21,    22,
+      23,    24,    11,    26,    -1,    -1,    -1,    25,    17,    18,
+      19,    20,    21,    22,    23,    24,    12,    26,    -1,    -1,
+      -1,    17,    18,    19,    20,    21,    22,    23,    24,    14,
+      26,    -1,    17,    18,    19,    20,    21,    22,    23,    24,
+      -1,    26,    16,    17,    18,    19,    20,    21,    22,    23,
+      24,    -1,    26,    16,    17,    18,    19,    20,    21,    22,
+      23,    24,    -1,    26,    17,    18,    19,    20,    21,    22,
+      23,    24,    -1,    26,    19,    20,    21,    22,    23,    24,
+      -1,    26,    22,    23,    24,    -1,    26
   };
 
   const unsigned char
   synExpParser::yystos_[] =
   {
-       0,     0,     5,     6,     7,     8,     9,    10,    15,    16,
-      17,    22,    24,    25,    25,    25,    15,    25,     0,    25,
-      16,    18,    19,    20,    21,    11,    14,    25,    26,    16,
-      25,    25,    25,    25,    25,    14,    25,    12,    25
+       0,     5,     6,     7,     8,     9,    10,    15,    25,    28,
+      29,    29,    29,    29,     0,    29,    16,    17,    18,    19,
+      20,    21,    22,    23,    24,    26,    11,    14,    16,    29,
+      29,    29,    29,    29,    29,    29,    29,    29,    29,    12,
+      29
   };
 
   const unsigned char
   synExpParser::yyr1_[] =
   {
-       0,    23,    24,    24,    24,    25,    25,    25,    25,    26,
-      26,    26,    25,    25,    25,    25,    25,    25,    25,    25,
-      25,    25,    25
+       0,    27,    28,    28,    29,    29,    29,    29,    29,    29,
+      29,    29,    29,    29,    29,    29,    29,    29,    29,    29,
+      29,    29
   };
 
   const unsigned char
   synExpParser::yyr2_[] =
   {
-       0,     2,     3,     2,     1,     3,     3,     2,     4,     1,
-       2,     0,     6,     4,     3,     3,     3,     1,     1,     1,
-       1,     1,     1
+       0,     2,     3,     2,     3,     3,     3,     3,     3,     3,
+       3,     2,     6,     4,     3,     3,     3,     1,     1,     1,
+       1,     1
   };
 
 
@@ -1168,18 +1168,18 @@ namespace kconf {
   {
   "T_EOF", "error", "$undefined", "T_MAINMENU", "T_MENU", "T_LITERAL",
   "T_SYMBOL", "T_TRUE", "T_FALSE", "T_MODULE", "T_IF", "T_THEN", "T_ELSE",
-  "T_UNEQUAL", "T_CLOSEPAREN", "T_OPENPAREN", "T_EOL", "T_XOR",
-  "T_IMPLIES", "T_OR", "T_AND", "T_EQUAL", "T_NOT", "$accept", "explist",
-  "exp", "seqexp", YY_NULLPTR
+  "T_UNEQUAL", "T_CLOSEPAREN", "T_OPENPAREN", "T_EOL", "T_IMPLIES", "T_OR",
+  "T_AND", "T_NOR", "T_NAND", "T_XOR", "T_XNOR", "T_IF_AND_ONLY_IF",
+  "T_NOT", "T_EQUAL", "$accept", "explist", "exp", YY_NULLPTR
   };
 
 #if YYDEBUG
   const unsigned char
   synExpParser::yyrline_[] =
   {
-       0,   116,   116,   120,   124,   127,   131,   135,   139,   143,
-     147,   152,   155,   159,   163,   167,   171,   175,   179,   183,
-     187,   191,   195
+       0,   120,   120,   126,   132,   138,   144,   150,   156,   162,
+     168,   174,   180,   186,   192,   198,   204,   210,   214,   218,
+     222,   226
   };
 
   // Print the state stack on the debug stream.
@@ -1214,8 +1214,8 @@ namespace kconf {
 
 #line 30 "synExpParser.ypp" // lalr1.cc:1167
 } // kconf
-#line 1189 "synExpParser.cpp" // lalr1.cc:1167
-#line 198 "synExpParser.ypp" // lalr1.cc:1168
+#line 1218 "synExpParser.cpp" // lalr1.cc:1167
+#line 243 "synExpParser.ypp" // lalr1.cc:1168
  /*** Additional Code ***/
 bool is_digits(const std::string &str)
 {
@@ -1226,3 +1226,4 @@ void kconf::synExpParser::error(const synExpParser::location_type& l,
 {
     driver.error(l, m);
 }
+

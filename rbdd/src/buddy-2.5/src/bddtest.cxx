@@ -33,7 +33,6 @@
 #include "bvec.h"
 
 using namespace std;
-using namespace buddy;
 
 
 #define ERROR(msg) fail(msg, __FILE__, __LINE__)

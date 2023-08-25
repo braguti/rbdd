@@ -2,24 +2,30 @@
 library(rbdd)
 
 # Create the BDDfactory
-bdd_manager_init("buddy")
+init_bdd()
 
-z = bdd_parse_boolstr("(a or b) and c")
+# Create variables in the factory
+new_variable("a")
+new_variable("b")
+new_variable("c")
 
-bdd_restrict(z, "b", "restrict1")
-bdd_restrict(z, "b", "restrict2", FALSE)
+z = new_variable_from_expression("(a or b) and c")
+
+restrict_bdd(z, "b", "restrict1")
+restrict_bdd(z, "b", "restrict2", FALSE)
 
 # Create the expression
-bdd_parse_boolstr("(restric2 or not (not restrict2 and restrict1)) and (not restric2 or (not restrict2 and restrict1))")
+fixed_b = new_variable_from_expression("restrict1 xor restrict2")
 
-bdd_info_variables()
+print_variables()
+
+# Apply function of the factory
+apply_bdd(fixed_b)
 
 # Get the number of nodes
 cat("The number of nodes is ")
-cat(bdd_info_node_number())
+cat(get_node_num())
 cat("\n")
 
 cat("The solved bdd is:\n")
-bdd_print()
-
-bdd_manager_quit()
+print_bdd()

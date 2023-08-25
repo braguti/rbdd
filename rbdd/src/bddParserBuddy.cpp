@@ -21,25 +21,24 @@ std::pair<SemanticsBuddy, int> bddParserBuddy::parseBdd(std::string expression, 
 		}
 		
 		RbddElem rbddElem = RbddUtils::getRbddElem(currentBDD, rbddElems);
-		if (rbddElem.getAdapter() == NULL) {
-			Rcpp::Rcerr << "There is not defined a BDD called " << currentBDD << std::endl;
+		if (rbddElem.getFactory() == NULL) {
+			std::cerr << "There is not defined a BDD called " << currentBDD << std::endl;
 			std::pair<SemanticsBuddy, int> result(semBuddy, 0);
 			return result;
 		}
 		
-		buddyAdapter* bAdapter = dynamic_cast<buddyAdapter*> (rbddElem.getAdapter());
-		bool buddy = bAdapter != nullptr;
-		
+		buddyFactory* bFactory = dynamic_cast<buddyFactory*> (rbddElem.getFactory());
+		bool buddy = bFactory != nullptr;
 		if (!buddy && isFirst) {
 			std::pair<SemanticsBuddy, int> result(semBuddy, -1);
 			return result;
 		} else if (!buddy && !isFirst) {
-			Rcpp::Rcerr << "There are BDD defined with different BDD libraries." << std::endl;
+			std::cerr << "There are BDD defined with different BDD libraries." << std::endl;
 			std::pair<SemanticsBuddy, int> result(semBuddy, 0);
 			return result;
 		}
 		
-		SemanticsBuddy currentSemBuddy(!bAdapter->getVar(currentBDD).main(), !bAdapter->getVar(currentBDD).module());
+		SemanticsBuddy currentSemBuddy(!bFactory->getVarBDD(currentBDD).main(), !bFactory->getVarBDD(currentBDD).module());
 		if (isNeg) {
 			SemanticsBuddy currentSemBuddy(!currentSemBuddy.main(), !currentSemBuddy.module());
 		}

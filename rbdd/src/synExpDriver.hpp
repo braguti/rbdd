@@ -50,7 +50,6 @@ private:
      * @return		true if successfully parsed
      */
     bool parse_file(const std::string filename);
-//    bool parse_string(const std::string s);
     bool parse_string(const std::string s, std::map<int, synExp*> synExpMap);
 
     // To demonstrate pure handling of parse errors, instead of
@@ -71,10 +70,10 @@ private:
     
     void addExp(synExp* s);
 
-    bool correctParsing = true;
+	bool correctParsing = true;
 
-    void setCorrectParsing(bool correctParsing);
-    bool getCorrectParsing();
+	void setCorrectParsing(bool correctParsing);
+	bool getCorrectParsing();
    };
 
 } // namespace kconf

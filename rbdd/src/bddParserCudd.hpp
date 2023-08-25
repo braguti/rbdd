@@ -1,10 +1,6 @@
 
-#ifndef __bddParserCudd__
-#define __bddParserCudd__
-
 #include <vector>
 #include "RbddUtils.hpp"
-#include <Rcpp.h>
 
 class bddParserCudd {
 
@@ -15,5 +11,3 @@ class bddParserCudd {
 		//	1: Cudd library
 		std::pair<SemanticsCudd, int> parseBdd(std::string expression, std::vector<RbddElem> rbddElems);
 };
-
-#endif /* defined(__bddParserCudd__) */

@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 david. All rights reserved.
 //
 
-#ifndef __synExp__
-#define __synExp__
+#ifndef __myKconf__synExp__
+#define __myKconf__synExp__
 
 #include <iostream>
 #include <algorithm>
@@ -20,170 +20,153 @@
 #include <math.h>
 #include <limits>
 #include "symbolTable.hpp"
-#include <Rcpp.h>
 
-enum synExpT    { synExp_Const,   synExp_Symbol,   synExp_Compound, synExp_XOR, synExp_String            };
+enum synExpT    { synExp_Const,   synExp_Symbol,   synExp_Compound, synExp_String                        };
 enum synConstsT { synConst_false, synConst_module, synConst_true                                         };
-enum synOp      { synNot, synAnd, synOr, synImplies, synIfThenElse, synEqual  };
+enum synOp      { synNot,         synAnd,          synOr          , synXor, synNand, synNor, synXnor, synImplies, synIff, synIfThenElse, synEqual  };
 
 class synExp {
     
     public:
     
-        synExp() { mySymbols = NULL; }
-
+        synExp() {}
+        virtual ~synExp() { std::cerr << "In destructor " << this << std::endl;};
         virtual synExpT                         get_type()          const                   = 0;
         virtual std::string                     get_string()        const { return "";           }
         virtual std::string                     getSymbol()         const {
-            throw std::logic_error("Error accessing getSymbol in wrong object.\n");
+            std::cerr << "Error accessing getSymbol in wrong object: " << this << std::endl;
             int *p = NULL;
-            Rcpp::stop(std::to_string(*p));
+            std::cerr << *p << std::endl;
+            exit(-1);
             return "";
         }
         virtual synOp                           get_op()            const {
-            throw std::logic_error("Error accessing getOp in wrong object.\n");
+            std::cerr << "Error accessing get_op in wrong object: " << this << std::endl;
             int *p = NULL;
-            Rcpp::stop(std::to_string(*p));
+            std::cerr << *p << std::endl;
+            exit(-1);
         }
         virtual synExp*                         first()             const {
+            //std::cerr << "Error accessing first in wrong object: " << this << std::endl;
+            //int *p = NULL;
+            //std::cerr << *p << std::endl;
+            //exit(-1);
             return NULL;
         }
         virtual synExp*                         second()            const {
+            //std::cerr << "Error accessing second in wrong object: " << this << std::endl;
+            //int *p = NULL;
+            //std::cerr << *p << std::endl;
+            //exit(-1);
             return NULL;
         }
         virtual synExp*                         third()             const {
+            //std::cerr << "Error accessing third in wrong object: " << this << std::endl;
+            //int *p = NULL;
+            //std::cerr << *p << std::endl;
+            //exit(-1);
             return NULL;
         }
-        virtual std::vector<synExp*>           get_parms()          const  {
-            throw (std::logic_error("Error accesing get_parms in wrong object"));
-        }
         virtual const std::set<synOp>&          giveOps()           const   {
-            Rcpp::Rcerr << "Error accesing giveOps in wrong object: " << this << std::endl;
+            std::cerr << "Error accesing giveOps in wrong object: " << this << std::endl;
             int *p = NULL;
-            Rcpp::stop(std::to_string(*p));
+            std::cerr << *p << std::endl;
+            exit(-1);
         }
-        virtual bool    isOr()       { return false; }
-        virtual bool    isAnd()      { return false; }
-        virtual bool    isNot()      { return false; }
-        virtual bool    isImplies()  { return false; }
-        virtual bool    isIf()       { return false; }
-        virtual bool    isEqual()    { return false; }
-        virtual bool    isSymbol()   { return false; }
-        virtual bool    isLiteral()  { return false; }
-        virtual bool    isXOR()      { return false; }
-        virtual bool    isConst()    { return false; }
-        virtual synExp* copy_exp() {
-            throw std::logic_error("Calling copy_exp in base class synExp\n");
-        }
-    
-        virtual void    destroy() {
-            throw std::logic_error("Calling destroy in base class synExp\n");
-        }
-        void deleteSymbols() {
-            if (mySymbols != NULL) {
-                mySymbols->clear();
-                delete mySymbols;
-                mySymbols = NULL;
-            }
-        }
-        //void addModules() { mySymbols.insert("MODULES"); }
-        void setSymbols(std::set<std::string>*ss) { mySymbols = ss; };
-        const std::set<std::string>&            giveSymbols()       {
-            if (mySymbols == NULL) {
-                mySymbols = new std::set<std::string>();
-                computeSymbols(mySymbols);
-            }
-            return *mySymbols;
-        }
-        virtual void computeSymbols(std::set<std::string> *ss) {};
-        const std::set<int>& giveSymbolIndices() const {
-            return myIndices;
-        }
-        virtual int opPriority() const { return 0; }
-        void computeIndices(std::map<std::string, int>& m) {
-            myIndices.clear();
-            std::set<std::string>::iterator it;
-            for(it = giveSymbols().begin(); it != giveSymbols().end(); ++it) {
-                const std::string & s = *it;
-                try {
-                    myIndices.insert(m.at(s));
-                }
-                catch(std::exception e) {
-                    throw std::logic_error("Error looking for key *"+s+"* in varMap");
-                }
-            }
-        }
-        friend std::ostream& operator<<(std::ostream& os, synExp* ps);
-        friend bool equal(synExp *e1, synExp *e2);
+        void addModules() { mySymbols.insert("MODULES"); }
+        const std::set<std::string>&            giveSymbols()       const { return mySymbols;    }
+        const std::set<int>&                    giveSymbolIndices() const { return myIndices;    }
+        virtual bool                            isGround()          const                   = 0;
+        virtual int                             opPriority()        const  { return 0;  }
+        void                                    computeIndices(std::map<std::string, int>& m) {
+                                                    myIndices.clear();
+                                                    for(const std::string & s : mySymbols) {
+                                                        myIndices.insert(m[s]);
+                                                    }
+                                                }
 
+        friend  std::ostream&          operator<<(std::ostream& os, synExp* ps);
+        friend  bool                   equal(synExp *e1, synExp *e2);
+    
     template <class Q>
-    int giveMax(const Q& var2pos) const {
+        int giveMax(const Q& q) const {
         int pos;
         int max = -1;
-        std::set<int>::iterator it;
-        for(it = giveSymbolIndices().begin(); it != giveSymbolIndices().end(); ++it) {
-            int x = *it;
-            if ((pos = var2pos.at(x)) > max) {
-                max = pos;
-            }
+        for(int x : giveSymbolIndices()) {
+            //std::cerr << "index " << x << " pos " << q[x] << std::endl;
+            if ((pos = q.at(x)) > max) {
+                    max = pos;
+                }
+                //else {
+                //    std::cerr << "var id " << x << " not found in order" << std::endl;
+                //    exit(-1);
+                //}
         }
         return max;
     }
-
     template <class Q>
     int giveMaxInd(const Q& q) const {
-        int pos, ind = 0;
+        int pos, ind;
         int max = -1;
-        std::set<int>::iterator it;
-        for(it = giveSymbolIndices().begin(); it != giveSymbolIndices().end(); ++it) {
-            int x = *it;
+        for(int x : giveSymbolIndices()) {
+            //std::cerr << "index " << x << " pos " << q[x] << std::endl;
             if ((pos = q.at(x)) > max) {
                 max = pos;
                 ind = x;
             }
+            //else {
+            //    std::cerr << "var id " << x << " not found in order" << std::endl;
+            //    exit(-1);
+            //}
         }
         return ind;
     }
 
     template <class Q>
     int giveMinInd(const Q& q) const {
-        int pos, ind = 0;
+        int pos, ind;
         int min = std::numeric_limits<int>::max();
-        std::set<int>::iterator it;
-        for(it = giveSymbolIndices().begin(); it != giveSymbolIndices().end(); ++it) {
-            int x = *it;
+        for(int x : giveSymbolIndices()) {
             if ((pos = q.at(x)) < min) {
                 min = pos;
                 ind = x;
             }
+            //else {
+            //    std::cerr << "var id " << x << " not found in order" << std::endl;
+            //    exit(-1);
+            //}
         }
         return ind;
     }
 
     template <class Q>
-    int giveMin(const Q& var2pos) const {
+    int giveMin(const Q& q) const {
         int pos;
         int min = std::numeric_limits<int>::max();
-        std::set<int>::iterator it;
-        for(it = giveSymbolIndices().begin(); it != giveSymbolIndices().end(); ++it) {
-            int x = *it;
-            if ((pos = var2pos.at(x)) < min) {
+        for(int x : giveSymbolIndices()) {
+            if ((pos = q.at(x)) < min) {
                     min = pos;
             }
+            //else {
+            //    std::cerr << "var id " << x << " not found in order" << std::endl;
+            //    exit(-1);
+            //}
         }
         return min;
     }
-
+    
     int   getMax()   const { return max;   }
     int   getMin()   const { return min;   }
     int   getLCA()   const { return lca;   }
     float getScore() const { return score; }
-
-    template <class Q>   void computeMaxMin(const Q& var2pos) {
-        max = giveMax(var2pos);
-        min = giveMin(var2pos);
+    
+    template <class Q>   void computeMaxMin(const Q& q) {
+        max = giveMax(q);
+        min = giveMin(q);
+        //std::cerr << "synExp max " << max << " min " << min << std::endl;
         if (min > max) {
-            Rcpp::stop("Min is bigger than max");
+            std::cerr << "Min is bigger than max in " << this << std::endl;
+            exit(-1);
         }
     }
     
@@ -191,53 +174,67 @@ class synExp {
         score = 0;
         for(int x = min; x <= max; x++) 
             score += weights[x];
+            //int l = ocSoFar[o[x]];
+            //if (l != 0)
+            //    score++;
+        
         return;
+        //if (max != min)
+        //    score = score / (max - min + 1);
+        
+        //score = log(score)/2.0 + (max - min)/2.0;
+        //score += max - min;
     }
 
     void setScore(double x) { score = x;}
     
-    template <class O>   double computeSpan(const O& var2pos) const {
-        int smin = std::numeric_limits<int>::max();
-        int smax = -1;
-        std::set<int>::iterator it;
-        for(it = myIndices.begin(); it != myIndices.end(); ++it) {
-            int i = *it;
-            if (var2pos[i] < smin) smin = var2pos[i];
-            if (var2pos[i] > smax) smax = var2pos[i];
-        }
-        return smax - smin;
+    template <class O>   double computeSumSpan(const O& o) const {
+        double tot = 0;
+        for(std::set<int>::iterator its =  myIndices.begin(); its !=  myIndices.end(); its++)
+            for(std::set<int>::iterator its2 = its; its2 != myIndices.end(); its2++)
+                if (its2 != its) {
+                    //std::cerr << "index " << *its << " pos " << o[*its] << " index " << *its2 << " pos " << o[*its2] << std::endl;
+                    tot += log(abs(o[*its] - o[*its2]));
+                }
+        return tot;
+
     }
+    
 
     void setLCA(int x) { lca = x; }
-
+    
     void thisOneIsProcessed() {
-        std::set<int>::iterator it;
-        for(it = myIndices.begin(); it != myIndices.end(); ++it) {
-            int index = *it;
+        for(int index : myIndices)
             weights[index]++;
-        }
+            //for(synExp *s : inverse[ss])
+            //    s->computeScore();
         return;
     }
-
+//    static void computeInverse(const std::vector<synExp*>& pending) {
+//        for(synExp* s : pending)
+//            for(const std::string& ss : s->giveSymbols())
+//                inverse[ss].insert(s);
+//    }
+    
+    //    static void firstScores(const std::vector<synExp*>& pending, const std::vector<std::string>& varList) {
+    //        for(synExp *s : pending) {
+    //
+    //        }
+    //    }
     static void numVars(int s) {
         ocSoFar.resize(s);
         weights.resize(s);
     }
-    virtual std::vector<int>    toDimacs(std::map<std::string, int>& theMap);
-    virtual void print(std::ostream& os) const;
-    virtual ~synExp() {
-        deleteSymbols();
-        myIndices.clear();
-    };
-    
 protected:
     
     static std::vector<int> ocSoFar;
     static std::vector<int> weights;
-    std::set<std::string> *mySymbols;
+    //static std::map<std::string&, std::set<synExp*> > inverse;
+    std::set<std::string> mySymbols;
     std::set<int>         myIndices;
     int max, min, lca;
     float score;
+    virtual void print(std::ostream& os) const;    
 };
 
 
@@ -250,14 +247,11 @@ synExp *makeNot(synExp* e1);
 synExp *makeImplies(synExp* e1, synExp* e2);
 synExp *makeIfThenElse(synExp* e1, synExp* e2, synExp* e3);
 synExp *makeEqual(synExp* e1, synExp* e2);
-synExp *makeXOR(std::vector<synExp*> v);
 std::list<synExp *> expandImplication(synExp* e);
-std::list<synExp *> toCNF(synExp* e);
 
 class synConst : public synExp {
 public:
     
-    synConst() : synExp() {};
     static synConst*       getSynFalse()  {
         if (!syncFalse)  syncFalse  = new synConst(synConst_false);  return syncFalse;
         }
@@ -267,23 +261,13 @@ public:
     static synConst*       getSynTrue()   {
         if (!syncTrue)   syncTrue   = new synConst(synConst_true);   return syncTrue;
         }
-    bool    isConst()    { return true; }
-    
-    static void delConst() {
-        delete synTrue;
-        delete synFalse;
-        delete synModule;
-    }
 
     synExpT                         get_type()              const { return synExp_Const; }
     synConstsT                      get_const()             const { return theConst;     }
   
     const std::set<synOp>&          giveOps()               const { return myOps;        }
-    //bool                            isGround()              const { return true;         }
+    bool                            isGround()              const { return true;         }
     int                             opPriority()            const { return 1;            }
-    synExp* copy_exp();
-
-    void destroy();
 
 
 
@@ -303,27 +287,12 @@ private:
 class synSymbol : public synExp {
 public:
     
-                                    synSymbol(std::string s) : synExp() {
-                                        name = s;
-                                    }
+                                    synSymbol(std::string s)    { name = s; mySymbols.insert(s);        }
     synExpT                         get_type()          const   { return synExp_Symbol;                 }
     std::string                     getSymbol()         const   { return name;                          }
     const std::set<synOp>&          giveOps()           const   { return myOps;                         }
-    //bool                            isGround()          const   { return false;                         }
+    bool                            isGround()          const   { return false;                         }
     int                             opPriority()        const   { return 1;                             }
-    bool                            isLiteral()                 { return true;                    }
-    bool                            isSymbol()                  { return true;                    }
-    virtual std::vector<int>        toDimacs(std::map<std::string, int>& theMap);
-    synExp* copy_exp();
-    void computeSymbols(std::set<std::string>* ss) {
-        ss->insert(name);
-    };
-    void    destroy();
-    //void    clear() { mySymbols.clear(); myIndices.clear(); myOps.clear(); }
-
-    ~synSymbol() {
-        myOps.clear();
-    };
 
     
 private:
@@ -340,7 +309,17 @@ private:
 class synCompound : public synExp {
 public:
     
-    synCompound(synOp op, synExp *e1, synExp *e2 = synFalse, synExp *e3 = synFalse) : synExp(), Cop(op), Ce1(e1), Ce2(e2), Ce3(e3) {
+    synCompound(synOp op, synExp *e1, synExp *e2 = synFalse, synExp *e3 = synFalse) : Cop(op), Ce1(e1), Ce2(e2), Ce3(e3) {
+        //mySymbols = e1->giveSymbols();
+        mySymbols.insert(e1->giveSymbols().begin(), e1->giveSymbols().end());
+        if (op != synNot) {// It is NULL for not
+            std::set<std::string> theSet = e2->giveSymbols();
+            mySymbols.insert(theSet.begin(), theSet.end());
+        }
+        if (op != synIfThenElse) {// It is NULL always except for IfThenElse
+            std::set<std::string> theSet = e3->giveSymbols();
+            mySymbols.insert(theSet.begin(), theSet.end());
+        }
         myOps.insert(op);
         if (e1->get_type() == synExp_Compound) {
             myOps.insert(e1->giveOps().begin(), e1->giveOps().end());
@@ -351,12 +330,17 @@ public:
     }
     int     opPriority() const  {
         switch(Cop) {
+            case synEqual      : return  2;
             case synNot        : return  3;
             case synAnd        : return  4;
-            case synOr         : return  4;
-            case synImplies    : return  7;
-            case synIfThenElse : return  8;
-            case synEqual      : return  2;
+            case synOr         : return  5;
+            case synXor        : return  6;
+            case synNand       : return  7;
+            case synXnor       : return  8;
+            case synNor        : return  9;
+            case synImplies    : return  10;
+            case synIff        : return  11;
+            case synIfThenElse : return  12;
             }
         return 0;
     }
@@ -368,31 +352,10 @@ public:
     synExp                          *third()            const   { return Ce3;               }
     const std::set<synOp>&          giveOps()           const   { return myOps;             }
 
-    //bool    isGround() const { return mySymbols.empty(); };
+    
+    bool    isGround() const { return mySymbols.empty(); };
 
     friend std::ostream& operator<<(std::ostream& os, synCompound* ps);
-    bool                            isOr()                        { return Cop == synOr         ;}
-    bool                            isAnd()                       { return Cop == synAnd        ;}
-    bool                            isNot()                       { return Cop == synNot        ;}
-    bool                            isImplies()                   { return Cop == synImplies    ;}
-    bool                            isIf()                        { return Cop == synIfThenElse ;}
-    bool                            isEqual()                     { return Cop == synEqual      ;}
-
-    bool                            isLiteral()                   { return Cop == synNot &&
-                                                                Ce1->get_type() == synExp_Symbol; }
-    synExp* copy_exp();
-    void computeSymbols(std::set<std::string>* ss) {
-        Ce1->computeSymbols(ss);
-        Ce2->computeSymbols(ss);
-        Ce3->computeSymbols(ss);
-    };
-    
-    void    destroy();
-    //void    clear() { mySymbols.clear(); myIndices.clear(); myOps.clear(); }
-
-    ~synCompound() {
-        myOps.clear();
-    };
     
 private:
     
@@ -405,55 +368,30 @@ private:
 
 };
 
-class synXOR : public synExp {
-public:
-    
-    synXOR(std::vector<synExp*> v) : v(v) {};
-    synExpT                         get_type()          const   { return synExp_XOR;   }
-    std::vector<synExp*>            get_parms()         const   { return v;            }
-    int                             opPriority()        const   { return 4;            }
-    void print(std::ostream& os) const;
-    friend std::ostream& operator<<(std::ostream& os, synXOR* ps);
-    void    destroy();
-    void computeSymbols(std::set<std::string>* ss) {
-        for(int i = 0; (unsigned)i < v.size(); i++) {
-            synExp* s = v[i];
-            s->computeSymbols(ss);
-        }
-    }
-    synExp* copy_exp();
-
-    
-private:
-    std::vector<synExp*> v;
-};
-
 class synString : public synExp {
 public:
     
-                                    synString(std::string s) : synExp(), st(s)     {};
+                                    synString(std::string s) : st(s)     {};
     synExpT                         get_type()          const { return synExp_String;   }
     std::string                     get_string()        const { return st;              }
     synExp*                         eval()                    { return this;            }
-    //bool                            isGround()          const { return false;           }
+    bool                            isGround()          const { return false;           }
     int                             opPriority()        const { return 1;               }
     const std::set<synOp>&          giveOps()           const { return myOps;           }
 
 
     friend std::ostream& operator<<(std::ostream& os, synString* ps);
-    synExp* copy_exp();
-    //void    clear() { mySymbols.clear(); myIndices.clear(); myOps.clear(); }
-
-    ~synString() {
-        myOps.clear();
-    };
 
 private:
     std::set<synOp>       myOps;
     std::string st;
     void print(std::ostream& os) const;
-    void    destroy();
 
 };
 
-#endif /* defined(__synExp__) */
+void destroy(synExp* s);
+
+
+
+
+#endif /* defined(__myKconf__synExp__) */

@@ -6,12 +6,11 @@
 //  Copyright (c) 2013 david. All rights reserved.
 //
 
-#ifndef __SemanticsBuddy__
-#define __SemanticsBuddy__
+#ifndef __myKconf__SemanticsBuddy__
+#define __myKconf__SemanticsBuddy__
 
 #include <iostream>
 #include <string>
-#include <Rcpp.h>
 
 #include "bdd.h"
 
@@ -34,9 +33,8 @@ class SemanticsBuddy {
     SemanticsBuddy(const bdd& a, const bdd& b);
     
     SemanticsBuddy& operator=(const SemanticsBuddy& t) {
-        Rcpp::stop("SemanticsBuddy const copy constructor");
-        //throw(-1); }//exit(-1); }
-    }
+        std::cout << "SemanticsBuddy const copy constructor" << std::endl;
+        exit(-1); }
     ~SemanticsBuddy() {}
     
     bool   getIsStr()     { return isStr; }
@@ -60,4 +58,4 @@ class SemanticsBuddy {
 
     
 };
-#endif /* defined(__SemanticsBuddy__) */
+#endif /* defined(__myKconf__SemanticsBuddy__) */

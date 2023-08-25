@@ -3,7 +3,7 @@
 //
 //
 //  Created by david on 21/06/16.
-//  Copyright Â© 2016 david. All rights reserved.
+//  Copyright © 2016 david. All rights reserved.
 //
 
 #ifndef SiftMinScore_hpp
@@ -14,24 +14,18 @@
 #include <fstream>
 #include <vector>
 #include <map>
-#include <algorithm>
 
-#include "MultiComponents.hpp"
 #include "humanNums.hpp"
 #include "synExpDriver.hpp"
-
-//typedef unsigned long long utScore ;
-//typedef long long tScore;
-typedef double utScore;
-typedef double tScore;
 
 struct siftRes {
     siftRes() {
     score = std::numeric_limits<int>::max();
     };
-    siftRes(utScore s, int pos) : score(s), pos(pos) {};
-    utScore score;
-    int pos;
+    siftRes(int p, double s, std::vector<int> v2p, std::vector<int> p2v) : score(s), pos(p), v2p(v2p), p2v(p2v) {};
+    double score;
+    int    pos;
+    std::vector<int> v2p, p2v;
 };
 
 class SiftMinScore {
@@ -39,105 +33,47 @@ class SiftMinScore {
     public :
     
     SiftMinScore(const std::string& varFile, const std::string& expFile);
-    SiftMinScore(const std::string expression, std::map<int, synExp*> synExpMap);
+	SiftMinScore(const std::string expression, std::map<int, synExp*> synExpMap);
+    
+    void go();
 
-    void setParsingResult(synExp* expression);
-    synExp* getParsingResult();
-
-    void setParserResult(int result);
-    int getParserResult();
-
-    virtual void go();
-    void goGroup();
+	void setParsingResult(synExp* expression);
+	synExp* getParsingResult();
+    
+	void setParserResult(int result);
+	int getParserResult();
     
     protected :
     
-            double  factor = 2;
-            utScore giveScore(int a, int b);
-            void    fillExpressionsVar();
-            void    readInfo(const std::string& varFile, const std::string& expFile);
-    virtual bool    sift(int var);
-            bool    siftGroup(int exp, std::set<int>& sExp);
-            int     computeSpan(int exp);
-            int     upperBound, lowerBound;
-            int      weight(int v);
-    virtual void     computeScore();
-    virtual utScore  computeScore(int exp);
-    virtual utScore  computeSetScore(const std::vector<int>& v2p, std::set<int> exps);
-    virtual utScore  computeOrderScore(const std::vector<int>& v2p, int exp, bool verbose);
-    virtual utScore  computeOrderScore(const std::vector<int>& v2p);
-            int      computeOrderSpan(const std::vector<int>& v2p, int exp);
-    virtual bool     stopCondition(const std::vector<int>& o, int pos1, int pos2);
+    bool    sift(int var);
+    void    computeScore();
+    int     computeSpan(int exp);
+    double  computeScore(int exp);
+    double  computeOrderScore(const std::vector<int>& v2p, int exp);
+    double  computeOrderScore(const std::vector<int>& v2p);
+    int     computeOrderSpan(const std::vector<int>& v2p, int exp);
+    bool    tooBigSpan(const std::vector<int>& o, int pos1, int pos2);
     
-            void     siftSet();
-    virtual siftRes  siftUp  (utScore startScore, std::vector<int> v2p, std::vector<int> p2v,
-                             std::vector<int> eMin,
-                             std::vector<int> eMax,
-                             std::vector<utScore> eScore,
-                             std::vector<std::vector<bool> > eps,
-                             int var);
-    virtual siftRes siftDown(utScore startScore, std::vector<int> v2p, std::vector<int> p2v,
-                             std::vector<int> eMin,
-                             std::vector<int> eMax,
-                             std::vector<utScore> eScore,
-                             std::vector<std::vector<bool> > eps,
-                             int var);
-    
-            siftRes siftUpGroup  (std::vector<int> v2p,
-                                  std::vector<int> p2v,
-                                  std::set<int> varPack,
-                                  std::set<int> s);
-            siftRes siftDownGroup(std::vector<int> v2p,
-                                  std::vector<int> p2v,
-                                  std::set<int> varPack,
-                                  std::set<int> s);
-    
-    virtual void    exchangeUpScore  (std::vector<int>& v2p,
-                                      std::vector<int>& p2v,
-                                      std::vector<int>& eMin,
-                                      std::vector<int>& eMax,
-                                      std::vector<utScore>& eScore,
-                                      std::vector<std::vector<bool> >& eps,
-                                      int pos, utScore& localScore);
-    virtual void    exchangeDownScore(std::vector<int>& v2p,
-                                      std::vector<int>& p2v,
-                                      std::vector<int>& eMin,
-                                      std::vector<int>& eMax,
-                                      std::vector<utScore>& eScore,
-                                      std::vector<std::vector<bool> >& eps,
-                                      int pos, utScore& localScore);
-    
-    
-    
-    virtual utScore  computeScore2(const std::vector<int>& v2p, int var1, int var2);
-    
-            void    wrapUp();
-            void    exchange(std::vector<int>& v2p, std::vector<int>& p2v, int pos1, int pos2);
-    virtual void    computeExpInfo(std::vector<int>& v2p) {};
-    virtual void    getBounds(int var);
-    void    check(std::string message) {
-        xx = score;
-        computeScore();
-        if (score  != xx) {
-                Rcpp::stop("%s score %f xx %f", message, score, xx);
-        }
+    void    siftSet();
+    siftRes siftUp  (std::vector<int> v2p, std::vector<int> p2v, int var);
+    siftRes siftDown(std::vector<int> v2p, std::vector<int> p2v, int var);
 
-    }
+    
+    double  computeScore2(const std::vector<int>& v2p, int pos, int otherpos);
+    
+    
+    void exchange(std::vector<int>& v2p, std::vector<int>& p2v, int pos1, int pos2);
+
     std::map<std::string, int>                      varMap;
-    std::vector<std::set<int> >                     expressions;
-    std::vector< std::set<int> >                    expressionsVar;
+    std::vector<std::vector<int> >                  expressions;
+    std::vector< std::vector<int> >                 expressionsVar;
     std::vector<std::string>                        variables;
     std::vector<int>                                pos2var, var2pos;
     int                                             max;
-    utScore                                         score, lastScore, xx;
+    double                                          score;
     std::set<int>                                   maxSet;
     int                                             maxRollBacks = 10;
-    std::vector<synExp*>                            expList;
-    std::vector<int>                                expMin;
-    std::vector<int>                                expMax;
-    std::vector<utScore>                            expScore;
-    std::vector<std::vector<bool> >                 mbExpPosSet;
-
+    
     private:
 
 	synExp* parsingResult;

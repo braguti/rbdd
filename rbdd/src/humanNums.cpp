@@ -17,6 +17,9 @@ std::string showHuman(double n) {
         if (n < 1E6)
             ost << std::setw(3) << (n/1000) << "k";
         else {
+            //std::cout.precision(2);
+            //ost << (n/1000000.0) << "M";
+            //std::cout.unsetf ( std::ios::floatfield );
             ost <<  std::setprecision(2) << std::setw(6) << (n/1E6) << "M";
         }
         return ost.str();
@@ -31,6 +34,9 @@ std::string showHuman(int n) {
         if (n < 1E6)
             ost << std::setw(3) << (n/1000) << "k";
         else {
+            std::cout.precision(2);
+            //ost << (n/1000000.0) << "M";
+            //std::cout.unsetf ( std::ios::floatfield );
             ost  << std::setprecision(2) << std::setw(6) << (n/1E6) << "M";
         }
     return ost.str();

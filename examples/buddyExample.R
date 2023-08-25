@@ -2,23 +2,34 @@
 library(rbdd)
 
 # Create the BDDfactory
-bdd_manager_init("buddy")
+init_bdd()
 
 # Create variables in the factory
-bdd_new_variable("x")
-bdd_new_variable("y")
-bdd_new_variable("z")
+new_variable("x")
+new_variable("y")
+new_variable("z")
 
 # Create the expression
-bdd_parse_cnf("examples/cnfExample.cnf")
+#myExpression = newVariableFromExpression("x and (not x or y) and (not z or not x)")
+# CNF
+myExpression = new_variable_from_expression("1 0 -1 2 0 -3 -1 0")
+# CNF file
+#myExpression = newVariableFromExpression("cnfExample.cnf")
+
+# Print the expression
+expression_to_string(myExpression)
+
+# Print the variables
+print_variables()
+
+# Apply function of the factory
+apply_bdd(myExpression)
 
 # Get the number of nodes
 cat("The number of nodes is ")
-cat(bdd_info_node_number())
+cat(get_node_num())
 cat("\n")
 
 # Save the BDD in a file
-bdd_write("executionBuddy")
-
-#bdd_manager_quit()
+save_bdd("executionBuddy")
 

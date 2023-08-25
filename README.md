@@ -1,2 +1,3 @@
-# rbdd
-rbdd is a R package to manage BDDs in order to encode feature models. Full documentation is provided in the library, accessible via the help command.
+## rbdd Package
+
+**rbdd** is an R package to create and manage BDDs.

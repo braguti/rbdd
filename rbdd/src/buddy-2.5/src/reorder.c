@@ -502,7 +502,7 @@ static BddTree *reorder_win3ite(BddTree *t)
 static void reorder_sift_bestpos(BddTree *blk, int middlePos)
 {
     
-    //int xerror = 0;
+    int xerror = 0;
     int startnum = reorder_nodenum();
     int best = reorder_nodenum();
     int maxAllowed;
@@ -510,12 +510,12 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
     int realpos = blk->pos;
     int dirIsUp = 1;
     int n,rn;
-    //int tot, acc;
+    int tot, acc;
     int moves    = 0;
     int allMoves = 0;
     int returnMoves = 0;
     float progress = 0;
-    //int temp;
+    int temp;
     int *memory = malloc(sizeof(int)*(middlePos*2+2));
     for(n = 0; n < middlePos*2+2; n++) memory[n] = 0;
     //printf("reorder_sift_bestpos start. memory for %d positions. Printorder                                                \n", middlePos*2+2);
@@ -535,7 +535,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
         printf("\nMoving blocks      %6.2f%% \r", 0.0);
     //printf("+");
     //fflush(stdout);
-    //acc = 0;
+    acc = 0;
     
    
     
@@ -551,7 +551,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
                    (reorder_nodenum() <= maxAllowed || first))
             {
                 first = 0;
-                //temp = reorder_nodenum();
+                temp = reorder_nodenum();
 //                         if (blk->prev != NULL)
 //                             printf("1b blockid %4d realpos %4d, bestpos %4d, before %8d nodes, after %8d nodes blk->id %8d memory %8d\n", blk->prev->id, realpos, bestpos,  temp, reorder_nodenum(), blk->id, memory[realpos]);
 //                         else
@@ -569,7 +569,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
                 if (memory[realpos] != 0 && memory[realpos] != reorder_nodenum()) {
                     printf("Error, after blockdown, not same node numbers\n");
                     printf("Realpos %d, before %d, after %d\n", realpos, memory[realpos], reorder_nodenum());
-                    //xerror = 1;
+                    xerror = 1;
                 }
                 memory[realpos] = reorder_nodenum();
                 
@@ -603,7 +603,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
                    ((rn = reorder_nodenum()) <= maxAllowed  ||  first))
             {
                 first = 0;
-                //temp = reorder_nodenum();
+                temp = reorder_nodenum();
 //                         if (blk->next != NULL)
 //                         printf("2b blockid %4d realpos %4d, bestpos %4d, before %8d nodes, after %8d nodes, blk->next->id %8d memory %8d\n",blk->id, realpos, bestpos,  temp, reorder_nodenum(), blk->next->id, memory[realpos]);
 //                         else
@@ -623,7 +623,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
                     printf("Error, after blockdown, not same node numbers\n");
                     printf("Realpos %d, before %d, after %d\n", realpos, memory[realpos], reorder_nodenum());
                     
-                    //xerror = 1;
+                    xerror = 1;
                 }
                 memory[realpos] = reorder_nodenum();
                 
@@ -658,8 +658,8 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
     
     /* Move to best pos */
     moves = 0;
-    //if (bestpos < 0) tot = -bestpos;
-    //else tot = bestpos;
+    if (bestpos < 0) tot = -bestpos;
+    else tot = bestpos;
     while (bestpos < 0)
     {
         //temp = reorder_nodenum();
@@ -671,7 +671,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
         if (memory[realpos] != 0 && memory[realpos] != reorder_nodenum()) {
             printf("Error, after blockdown, not same node numbers\n");
             printf("Realpos %d, before %d, after %d\n", realpos, memory[realpos], reorder_nodenum());
-            //xerror = 1;
+            xerror = 1;
         }
         memory[realpos] = reorder_nodenum();
         
@@ -699,7 +699,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
             printf("Error, after blockdown, not same node numbers\n");
             printf("Realpos %d, before %d, after %d\n", realpos, memory[realpos], reorder_nodenum());
             
-            //xerror = 1;
+            xerror = 1;
         }
         memory[realpos] = reorder_nodenum();
         
@@ -732,7 +732,7 @@ static void reorder_sift_bestpos(BddTree *blk, int middlePos)
 static BddTree *reorder_sift_seq(BddTree *t, BddTree **seq, int num)
 {
     BddTree *this;
-    int n, eta/*, previous_nodenum*/;
+    int n, eta, previous_nodenum;
     long c2, c1 = clock();
     float percent, elapsed;
     if (t == NULL)
@@ -1058,13 +1058,13 @@ static void blockdown(BddTree *left)
 {
     
     BddTree *right = left->next;
-    int n = 0;
+    int n,tcounter = 0;
     int leftsize = left->last - left->first;
     int rightsize = right->last - right->first;
     int leftstart = bddvar2level[left->seq[0]];
     int *lseq = left->seq;
     int *rseq = right->seq;
-    //int tempx = 0;
+    int tempx = 0;
     if (verbose > 1) {
         //printf("\nCurrent movement    %6.2f%%             \r", 0.0);
     //fflush(stdout);
@@ -2717,9 +2717,9 @@ static void print_order_rec(FILE *o, BddTree *t, int level)
 	 reorder_filehandler(o,t->id);
       else
           if (t->first == t->last)
-              fprintf(o, "%3d : first %5d last %5d next %10d prev %10d this %10d bddvar2level %5d", t->id, t->first, t->last, t->next->id, t->prev->id, t->id, bddvar2level[t->first]);
+              fprintf(o, "%3d : first %5d last %5d next %10d prev %10d this %10d bddvar2level %5d", t->id, t->first, t->last, (unsigned int)t->next,(unsigned int) t->prev, (unsigned int)t, bddvar2level[t->first]);
        else
-           fprintf(o, "%3d : first %5d last %5d next %10d prev %10d this %10d bddvar2level %5d %5d ******", t->id, t->first, t->last, t->next->id, t->prev->id, t->id, bddvar2level[t->first], bddvar2level[t->last]);
+           fprintf(o, "%3d : first %5d last %5d next %10d prev %10d this %10d bddvar2level %5d %5d ******", t->id, t->first, t->last, (unsigned int)t->next,(unsigned int) t->prev, (unsigned int)t, bddvar2level[t->first], bddvar2level[t->last]);
       fprintf(o, "\n");
       
       print_order_rec(o, t->next, level);

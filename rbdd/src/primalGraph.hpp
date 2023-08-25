@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 david. All rights reserved.
 //
 
-#ifndef __primalGraph__
-#define __primalGraph__
+#ifndef __myKconf__primalGraph__
+#define __myKconf__primalGraph__
 
 #include <iostream>
 #include <iomanip>
@@ -39,6 +39,8 @@ class primalGraph {
     
         int  getWeight(std::string s) { return weight[s]; }
         void incGraph(std::string a, std::string b) {
+            //int x = 50 - a.length();
+            //std::cerr << "Adding to primal graph *" << a << "*" << std::setw(x) << " *" << b << "*" << std::endl;
             weight[a]++;
             weight[b]++;
             if (a < b)
@@ -52,4 +54,4 @@ class primalGraph {
 
 
 };
-#endif /* defined(__primalGraph__) */
+#endif /* defined(__myKconf__primalGraph__) */

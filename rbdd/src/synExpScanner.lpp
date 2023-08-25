@@ -72,26 +72,27 @@ n	[A-Za-z0-9_]
     int str = 0;
     int ts = 0, i = 0;
 
-synTrue             { return synExpParser::make_T_TRUE(loc);                }
-synFalse            { return synExpParser::make_T_FALSE(loc);               }
-synModule           { return synExpParser::make_T_MODULE(loc);              }
+true|TRUE           { return synExpParser::make_T_TRUE(loc);                }
+false|FALSE         { return synExpParser::make_T_TRUE(loc);                }
+module|MODULE       { return synExpParser::make_T_TRUE(loc);                }
 if|IF               { return synExpParser::make_T_IF(loc);                  }
 then|THEN           { return synExpParser::make_T_THEN(loc);                }
 else|ELSE           { return synExpParser::make_T_ELSE(loc);                }
 and|AND             { return synExpParser::make_T_AND(loc);                 }
 or|OR               { return synExpParser::make_T_OR(loc);                  }
+xor|XOR             { return synExpParser::make_T_XOR(loc);                 }
+xor|NAND            { return synExpParser::make_T_NAND(loc);                }
+xor|NOR             { return synExpParser::make_T_NOR(loc);                 }
+xor|XNOR            { return synExpParser::make_T_XNOR(loc);                }
+iff            		{ return synExpParser::make_T_IF_AND_ONLY_IF(loc);      }
 \(                  { return synExpParser::make_T_OPENPAREN(loc);           }
 \)                  { return synExpParser::make_T_CLOSEPAREN(loc);          }
 not|NOT             { return synExpParser::make_T_NOT(loc);                 }
 =                   { return synExpParser::make_T_EQUAL(loc);               }
 !=                  { return synExpParser::make_T_UNEQUAL(loc);             }
 ->                  { return synExpParser::make_T_IMPLIES(loc);             }
-XOR|Xor|xor         { return synExpParser::make_T_XOR(loc);                 }
-\"[^\"*]\"   {
-            return synExpParser::make_T_LITERAL(std::string(yytext, 1, strlen(yytext) - 2), loc);     }
-
-[a-zA-Z_0-9:\\\/@$\-\+\.\,!]+     {
-    return synExpParser::make_T_SYMBOL(yytext, loc);      }
+\"[a-zA-Z0-9_]+\"   { return synExpParser::make_T_LITERAL(std::string(yytext, 1, strlen(yytext) - 2), loc);     }
+[a-zA-Z0-9_\-]+       { return synExpParser::make_T_SYMBOL(yytext, loc);      }
 \n                  { loc.lines(1); return synExpParser::make_T_EOL(loc);   }
 .                   { };
 
@@ -129,6 +130,7 @@ int synExpFlexLexer::yylex()
     std::cerr << "in synExpFlexLexer::yylex() !" << std::endl;
     return 0;
 }
+
 
 
 

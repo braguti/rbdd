@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 david. All rights reserved.
 //
 
-#ifndef __SemanticsCudd__
-#define __SemanticsCudd__
+#ifndef __myKconf__SemanticsCudd__
+#define __myKconf__SemanticsCudd__
 
 #include <iostream>
 #include <string>
@@ -15,7 +15,6 @@
 #include <cudd.h>
 #include <mtr.h>
 #include <cuddObj.hh>
-#include <Rcpp.h>
 
 using namespace cudd;
 
@@ -31,7 +30,7 @@ class SemanticsCudd {
 
     public:
     
-    void static printMgr() { Rcpp::Rcout << "Manager: " << pmgr << std::endl << std::flush;  }
+    void static printMgr() { std::cout << "Manager: " << pmgr << std::endl << std::flush;  }
     SemanticsCudd() : logicValue(std::pair<const cudd::BDD&, const cudd::BDD&>(pmgr->bddZero(), pmgr->bddZero()))
     { isStr = false;
     }
@@ -40,7 +39,7 @@ class SemanticsCudd {
     
     static  void  setManager(Cudd* pmanager)  { pmgr = pmanager; }
     SemanticsCudd& operator=(const SemanticsCudd& t) {
-        Rcpp::Rcout << "SemanticsCudd const copy constructor" << std::endl;
+        std::cout << "SemanticsCudd const copy constructor" << std::endl;
         exit(-1); }
     ~SemanticsCudd() {}
     
@@ -70,4 +69,4 @@ class SemanticsCudd {
 
     
 };
-#endif /* defined(__SemanticsCudd__) */
+#endif /* defined(__myKconf__SemanticsCudd__) */

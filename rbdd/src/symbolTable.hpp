@@ -6,45 +6,35 @@
 //  Copyright (c) 2014 david. All rights reserved.
 //
 
-#ifndef __symbolTable__
-#define __symbolTable__
+#ifndef __myKconf__symbolTable__
+#define __myKconf__symbolTable__
 
 #include <stdio.h>
 #include <iostream>
-#include <vector>
 #include <map>
-#include <set>
 #include <string>
-#include <algorithm>
 
-class configInfo;
+class varInfo;
+
+//class configInfo;
 
 class symbolTable {
     
   private:
     
-    static std::map<std::string, configInfo*> table;
-    static std::map<std::string, int>         mapTimesDeclared;
-    static std::vector<configInfo*>           ordered;
-    static std::set<std::string>              undefined;
-
+    static std::map<std::string, varInfo*> table;
+    
   public:
     
-    static std::vector<configInfo*>::iterator getIterator(std::string s);
+    typedef std::map<std::string, varInfo*>::iterator iterator;
+    static int      size()  { return table.size();  }
+    static iterator begin() { return table.begin(); }
+    static iterator end()   { return table.end();   }
     
-    typedef std::vector<configInfo*>::iterator iterator;
-    static int      size()  { return ordered.size();  }
-    static iterator begin() { return ordered.begin(); }
-    static iterator end()   { return ordered.end();   }
-    static std::set<std::string> getUndefined() { return undefined;}
-    
-    static  int     timesDeclared(std::string s);
-    static  void    declareSymbol(std::string s, configInfo* p);
-    static  void    addSymbol(std::string s, configInfo* p);
-    static  void    deleteSymbol(std::string s);
+    static  void     addSymbol(std::string s, varInfo* p);
     //static  configInfo *addString(std::string name, std::string value);
-    static  configInfo *getSymbol(std::string s);
+    static  varInfo *getSymbol(std::string s);
     
 };
 
-#endif /* defined(__symbolTable__) */
+#endif /* defined(__myKconf__symbolTable__) */

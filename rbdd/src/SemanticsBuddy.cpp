@@ -48,8 +48,8 @@ const SemanticsBuddy operator||(const SemanticsBuddy& e1, const SemanticsBuddy& 
 
 const SemanticsBuddy operator==(const SemanticsBuddy& e1, const SemanticsBuddy& e2) {
     return SemanticsBuddy(
-                        ((e1.logicValue.first   & e2.logicValue.first)    | ((!e1.logicValue.first)   & !e2.logicValue.first)) &
-                         ((e1.logicValue.second & e2.logicValue.second)  | ((!e1.logicValue.second) & !e2.logicValue.second)),
+                        ((e1.logicValue.first   & e2.logicValue.first)    | (!e1.logicValue.first   & !e2.logicValue.first)) &
+                         ((e1.logicValue.second & e2.logicValue.second)  | (!e1.logicValue.second & !e2.logicValue.second)),
                           buddy::bddfalse);
                           }
 
@@ -59,20 +59,20 @@ const SemanticsBuddy operator!=(const SemanticsBuddy& e1, const SemanticsBuddy& 
 
 const SemanticsBuddy operator!(const SemanticsBuddy& e) {
   
-    return SemanticsBuddy((!e.logicValue.first) | e.logicValue.second,
+    return SemanticsBuddy(! e.logicValue.first | e.logicValue.second,
                 e.logicValue.second);
 }
 
 const SemanticsBuddy operator<(const SemanticsBuddy& e1, const SemanticsBuddy& e2) {
     return SemanticsBuddy(bdd_ite(e2.logicValue.first,
-                                 bdd_ite(e2.logicValue.second, (!e1.logicValue.first) | e1.logicValue.second, buddy::bddtrue),
-                                 (!e1.logicValue.first) & !e1.logicValue.second), buddy::bddfalse);
+                                 bdd_ite(e2.logicValue.second, ! e1.logicValue.first | e1.logicValue.second, buddy::bddtrue),
+                                 !e1.logicValue.first & !e1.logicValue.second), buddy::bddfalse);
 }
 
 const SemanticsBuddy operator>(const SemanticsBuddy& e1, const SemanticsBuddy& e2) {
     return SemanticsBuddy(bdd_ite(e1.logicValue.first,
-                            bdd_ite(e1.logicValue.second, (!e2.logicValue.first) | e2.logicValue.second, buddy::bddtrue),
-                          (!e2.logicValue.first) & !e2.logicValue.second), buddy::bddfalse);
+                            bdd_ite(e1.logicValue.second, ! e2.logicValue.first | e2.logicValue.second, buddy::bddtrue),
+                          !e2.logicValue.first & !e2.logicValue.second), buddy::bddfalse);
 }
 
 bool equal(const SemanticsBuddy& e1, const SemanticsBuddy& e2) {

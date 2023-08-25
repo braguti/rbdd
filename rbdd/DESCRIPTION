@@ -1,11 +1,11 @@
 Package: rbdd
 Type: Package
-Title: Implements Binary Decision Diagram Utilities
+Title: Implements BDD Utilities
 Version: 1.0
-Date: 2019-11-03
+Date: 2016-06-20
 Author: Sergio Bra Gutierrez
 Maintainer: Sergio Bra Gutierrez <sergio.bra88@gmail.com>
-Description: An implementation of the main Binary Decision Diagram libraries for R.
+Description: An implementation of the main bdd libraries for R
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.12.4), gmp (>= 0.5-13.5), Rmpfr (>= 0.7-2)
+Imports: Rcpp (>= 0.12.4)
 LinkingTo: Rcpp
